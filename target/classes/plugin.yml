@@ -1,5 +1,8 @@
 name: MiniElementGaming
-version: unknown
+version: "93dd148"
 description: Plugin for MiniElementGaming Minecraft server
 authors: ['Barteks2x']
-main: org.Barteks2x.minielementgaming.Plugin
+main: org.barteks2x.minielementgaming.Plugin
+commands:
+  makearena:
+    description: Make arena

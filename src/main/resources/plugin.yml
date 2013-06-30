@@ -1,0 +1,5 @@
+name: MiniElementGaming
+version: ${describe}
+description: ${description}
+authors: ['Barteks2x']
+main: org.Barteks2x.minielementgaming.Plugin

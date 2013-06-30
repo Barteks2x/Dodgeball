@@ -1,0 +1,5 @@
+name: MiniElementGaming
+version: unknown
+description: Plugin for MiniElementGaming Minecraft server
+authors: ['Barteks2x']
+main: org.Barteks2x.minielementgaming.Plugin

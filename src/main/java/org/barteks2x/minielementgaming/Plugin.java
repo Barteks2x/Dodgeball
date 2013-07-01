@@ -13,9 +13,9 @@ public class Plugin extends JavaPlugin {
 	@Override
 	public void onEnable() {
 		worldedit = (WorldEditPlugin)Bukkit.getServer().getPluginManager().getPlugin("WorldEdit");
-		Listener l = new MinigameListener(this);
+		CommandExecutor exec = new MinigameLogic(this, worldedit);
+		Listener l = (Listener)exec;
 		getServer().getPluginManager().registerEvents(l, this);
-		CommandExecutor exec = new MinigameCommandExecutor(this, worldedit, (MinigameListener)l);
 		getCommand("meg").setExecutor(exec);
 		getCommand("join").setExecutor(exec);
 		getCommand("leave").setExecutor(exec);

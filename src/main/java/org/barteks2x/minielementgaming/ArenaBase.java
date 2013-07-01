@@ -11,7 +11,7 @@ import org.bukkit.event.player.PlayerMoveEvent;
 public abstract class ArenaBase implements Serializable {
 
 	private static final long serialVersionUID = 342134832462L;
-	protected final LocationSerializable minPoint, maxPoint;
+	protected final CubeSerializable area;
 	protected final Minigame minigame;
 	protected final Map<String, MinigamePlayer> players;
 	protected final int[] teamPlayerCount;
@@ -24,8 +24,7 @@ public abstract class ArenaBase implements Serializable {
 			throw new IllegalArgumentException("Arena size is zero!");
 		}
 		players = new HashMap<String, MinigamePlayer>();
-		this.minPoint = new LocationSerializable(minPoint);
-		this.maxPoint = new LocationSerializable(maxPoint);
+		this.area = new CubeSerializable(minPoint, maxPoint);
 		this.minigame = mg;
 		teamPlayerCount = new int[teams];
 	}
@@ -35,5 +34,35 @@ public abstract class ArenaBase implements Serializable {
 	public abstract void handlePlayerInteract(PlayerInteractEvent e);
 
 	public void addPlayer(Player player, MinigameTeam team) {
+		if (players.containsKey(player.getName())) {
+			return;
+		}
+		players.put(player.getName(), new MinigamePlayer(player, team, minigame));
+	}
+
+	public void addPlayer(Player player) {
+		if (players.containsKey(player.getName())) {
+			return;
+		}
+		players.put(player.getName(), new MinigamePlayer(player, autoSelectTeam(), minigame));
+	}
+
+	public boolean isPlayerInArena(Player p) {
+		return area.isPlayerInArea(p);
+	}
+
+	public boolean isPlayerInMinigame(Player p) {
+		return players.containsKey(p.getName());
+	}
+
+	private MinigameTeam autoSelectTeam() {
+		int lowest = Integer.MAX_VALUE;
+		int team = 0;
+		for (int i = 0; i < teamPlayerCount.length; ++i) {
+			if (teamPlayerCount[i] < lowest) {
+				team = i;
+			}
+		}
+		return MinigameTeam.values()[team];
 	}
 }

@@ -3,15 +3,19 @@ package org.barteks2x.minielementgaming;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.selections.Selection;
 import java.util.*;
+import java.util.logging.Level;
 import org.bukkit.Location;
 import org.bukkit.command.*;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 
-public class MinigameCommandExecutor implements CommandExecutor {
+public class MinigameLogic implements CommandExecutor, Listener {
 
 	private final Plugin plugin;
 	private final WorldEditPlugin worldedit;
-	private final MinigameListener l;
 	private final int minArenaSizeXZ = 10;
 	private final int minArenaSizeY = 4;
 	private final String noargsmsg =
@@ -19,11 +23,33 @@ public class MinigameCommandExecutor implements CommandExecutor {
 	private final String noselectionmsg = "Nothing selected. You must select arena!";
 	private final String toosmallarenamsg = "Too small arena! Arena must be at least " +
 			minArenaSizeXZ + "x" + minArenaSizeY + "x" + minArenaSizeXZ;
+	public final Map<String, ArenaBase> minigames = new HashMap<String, ArenaBase>();
+	public final Map<String, String> players = new HashMap<String, String>();
+	private ArenaBase selectedArena;
 
-	MinigameCommandExecutor(Plugin plugin, WorldEditPlugin worldedit, MinigameListener l) {
+	MinigameLogic(Plugin plugin, WorldEditPlugin worldedit) {
 		this.plugin = plugin;
 		this.worldedit = worldedit;
-		this.l = l;
+	}
+
+	@EventHandler
+	public void onPlayerMove(PlayerMoveEvent e) {
+
+		String a = players.get(e.getPlayer().getName());
+		if (a == null) {
+			return;
+		}
+		ArenaBase ab = minigames.get(a);
+		if (ab == null) {
+			plugin.getLogger().log(Level.WARNING, "Error! Couldn't find player in minigame arena!");
+			return;
+		}
+		ab.handlePlayerMove(e);
+	}
+
+	@EventHandler
+	public void onPlayerInteract(PlayerInteractEvent e) {
+		//TODO onPlayerInteract
 	}
 
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
@@ -46,7 +72,13 @@ public class MinigameCommandExecutor implements CommandExecutor {
 	}
 
 	private boolean join(CommandSender sender, Iterator<String> args) {
-		return false;//TODO join
+		if (!(sender instanceof Player)) {
+			sender.sendMessage("This command must be executed by player");
+			return true;
+		}
+		players.put(((Player)sender).getName(), "example");
+		minigames.get("example").addPlayer((Player)sender);
+		return true;
 	}
 
 	private boolean minigame(CommandSender sender, Iterator<String> args) {
@@ -149,7 +181,6 @@ public class MinigameCommandExecutor implements CommandExecutor {
 	}
 
 	private boolean autobuild(CommandSender sender, Iterator<String> args) {
-		//TODO autobuild - rewrite to use iterator
 		Selection sel = worldedit.getSelection((Player)sender);
 		if (sel == null) {
 			sender.sendMessage(noselectionmsg);
@@ -191,11 +222,13 @@ public class MinigameCommandExecutor implements CommandExecutor {
 		ArenaCreator creator = new ArenaCreator(minPoint, maxPoint, blocks[0],
 				blocks[1], blocks[2], blocks[3], sectionHeight);
 		creator.runTaskLater(plugin, 1);//avoid lag when command is executed
+		ArenaBase arena = new DodgeBallArena(minPoint, maxPoint);
+		selectedArena = arena;
+		minigames.put("example", arena);
 		return true;
 	}
 
-	private boolean select(CommandSender sender,
-			Iterator<String> args) {
+	private boolean select(CommandSender sender, Iterator<String> args) {
 		//TODO Auto-generated method
 		return false;
 	}

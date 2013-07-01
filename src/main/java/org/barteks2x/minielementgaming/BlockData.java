@@ -1,7 +1,10 @@
 package org.barteks2x.minielementgaming;
 
-public class BlockData {
+import java.io.Serializable;
 
+public class BlockData implements Serializable {
+
+	private static final long serialVersionUID = 4252365235623845L;
 	public final int id;
 	public final byte meta;
 

@@ -1,8 +1,98 @@
 name: MiniElementGaming
-version: "93dd148"
+version: 0.0-1-g5e22ddb
 description: Plugin for MiniElementGaming Minecraft server
-authors: ['Barteks2x']
+author: Barteks2x
 main: org.barteks2x.minielementgaming.Plugin
+depend: [WorldEdit]
+loadbefore: [WorldEdit]
 commands:
-  makearena:
+  meg:
     description: Make arena
+    usage: |
+        Use /meg help <subcommand> [<subcommand2>] or /mghelp for more information
+        <something> - required parameter
+        [<something>] - optional parameter
+        /meg reload-config OR rc - reload minigame config
+        /meg arena autobuild <name> <type> <floor-id>[:<meta>] <wall-id1>[:<meta>]
+                  <wall-id2>[:<meta>] <line-id>[:<meta>] height - 
+                  build arena in worldedit selection. Example: 
+                  /meg arena autobuild minigame1 db 5:3 35:11 20 89 3
+        /meg arena select - select current worldedit selection as arena
+        /meg arena savestate <minigame-name> [<on-start-auto-rebuild(true/false)>] - save current arena state (minigame MUST be created)
+        /meg arena rebuild <minigame-name> - rebuild minigame arena (using saved state)
+        /meg create <type> <name> <additional-data> - create minigame in selected arena
+        /meg delete <name>
+        /meg start <name>
+        /meg stop <name>
+        /meg kickplayer <minigame-name> <player>
+        /meg join <name> or /join - join minigame
+        /meg leave or /leave - leave minigame
+    permission: minigame
+  join:
+    description: Join minigame
+    usage: /join <name>
+    permission: minigame.join
+  leave:
+    description: Leave current minigame
+    usage: /leave
+    permission: minigame.leave
+  mghelp:
+    description: Minigame halp
+    usage: /mghelp [<subcommand1>] [<subcommand2>]
+permissions:
+  minigame.*:
+    description: Gives access to all minigame commands
+    children:
+      minigame.reload: true
+      minigame.arena.*: true
+      minigame.create: true
+      minigame.delete: true
+      minigame.start: true
+      minigame.stop: true
+      minigame.player.*: true
+      minigame.help.*: true
+  minigame.reload:
+    description: Gives access to reload minigames configuration
+  minigame.arena.*:
+    description: Gives access to all arena commands
+    children:
+      minigame.arena.autobuild: true
+      minigame.arena.select: true
+      minigame.arena.save: true
+      minigame.arena.rebuild: true
+  minigame.arena.autobuild:
+    description: Gives access to /meg arena autobuild
+  minigame.arena.select:
+    description: Gives access to /meg arena select
+  minigame.arena.save:
+    description: Gives access to /meg arena savestate
+  minigame.arena.rebuild:
+    description: Gives access to /meg arena rebuild
+  minigame.create:
+    description: Gives access to /meg create
+  minigame.delete: 
+    description: Gives access to /meg delete
+  minigame.start: 
+    description: Gives access to /meg start
+  minigame stop: 
+    description: Gives access to /meg stop
+  minigame.player.*:
+    description: Gives access to all commands recommended for players
+    children:
+      minigame.join: true
+      minigame.leave: true
+      minigame.help.player: true
+  minigame.join:
+    description: Gives access to /meg join (/join)
+  minigame.leave:
+    description: Gives access to /meg leave (/leave)
+  minigame.help.*:
+    description: Minigame help commands
+    children:
+      minigame.help.admin: true
+  minigame.help.player:
+    description: Minigame help for players (only player commands)
+  minigame.help.admin:
+    description: Minigame help for admins (all commands)
+    children:
+      minigame.help.player: true

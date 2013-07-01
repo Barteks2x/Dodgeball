@@ -13,4 +13,38 @@ public class BlockData {
 		this.id = id;
 		this.meta = (byte)meta;
 	}
+
+	public BlockData(String idMeta) {
+		this(getIdFromString(idMeta), getMetaFromString(idMeta));
+	}
+
+	private static int getIdFromString(String idMeta) {
+		String data;
+		if (idMeta.contains(":")) {
+			String[] s = idMeta.split(":");
+			if (s.length == 0) {
+				data = idMeta.replace(":", "");
+			} else {
+				data = s[0];
+			}
+		} else {
+			data = idMeta;
+		}
+		return Integer.valueOf(data);
+	}
+
+	private static int getMetaFromString(String idMeta) {
+		String data;
+		if (idMeta.contains(":")) {
+			String[] s = idMeta.split(":");
+			if (s.length < 2) {
+				data = idMeta.replace(":", "");
+			} else {
+				data = s[1];
+			}
+		} else {
+			data = "0";
+		}
+		return Integer.valueOf(data);
+	}
 }

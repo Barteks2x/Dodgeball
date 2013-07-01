@@ -3,8 +3,8 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.barteks2x</groupId>
 	<artifactId>minielementgaming</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
-	<name>MinielElementGaming</name>
+	<version>0.0</version>
+	<name>MiniElementGaming</name>
 	<description>Plugin for MiniElementGaming Minecraft server</description>
 	<properties>
 		<gitdescribe-prefix></gitdescribe-prefix>

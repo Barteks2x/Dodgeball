@@ -55,6 +55,10 @@ public abstract class ArenaBase implements Serializable {
 		return players.containsKey(p.getName());
 	}
 
+	void removePlayer(Player player) {
+		players.remove(player.getName());
+	}
+
 	private MinigameTeam autoSelectTeam() {
 		int lowest = Integer.MAX_VALUE;
 		int team = 0;

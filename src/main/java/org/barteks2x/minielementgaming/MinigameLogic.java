@@ -120,7 +120,13 @@ public class MinigameLogic implements CommandExecutor, Listener {
 	}
 
 	private boolean leave(CommandSender sender) {
-		return false;//TODO leave
+		if (!(sender instanceof Player)) {
+			sender.sendMessage("This command must be executed by player");
+			return true;
+		}
+		players.remove(((Player)sender).getName());
+		minigames.get("example").removePlayer((Player)sender);
+		return true;
 	}
 
 	private boolean help(CommandSender sender, Iterator<String> args) {

@@ -3,7 +3,6 @@ package org.barteks2x.minielementgaming;
 import java.io.Serializable;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.bukkit.util.Vector;
 
 public class CubeSerializable implements Serializable {
 
@@ -16,6 +15,12 @@ public class CubeSerializable implements Serializable {
 	}
 
 	public CubeSerializable(LocationSerializable minPoint, LocationSerializable maxPoint) {
+		//double x1 = minPoint.x;
+		//double y1 = minPoint.y;
+		//double z1 = minPoint.z;
+		//double x2 = maxPoint.x;
+		//double y2 = maxPoint.y;
+		//double z2 = maxPoint.z;
 		this.maxPoint = maxPoint;
 		this.minPoint = minPoint;
 	}
@@ -33,40 +38,38 @@ public class CubeSerializable implements Serializable {
 	}
 
 	public void setPlayerInArea(Player p, Location newPos) {
-		int x = newPos.getBlockX();
-		int y = newPos.getBlockY();
-		int z = newPos.getBlockZ();
+		double x = newPos.getX();
+		double y = newPos.getY();
+		double z = newPos.getZ();
 		boolean f = false;
 		Location min = minPoint.getLocation();
 		Location max = maxPoint.getLocation();
-		if (x < min.getBlockX()) {
+		if (x < min.getX()) {
 			newPos.setX(newPos.getX() + 1);
 			f = true;
 		}
-		if (x > max.getBlockX()) {
+		if (x > max.getX()) {
 			newPos.setX(newPos.getX() - 1);
 			f = true;
 		}
-		if (y < min.getBlockX()) {
+		if (y < min.getY()) {
 			newPos.setY(newPos.getY() + 1);
 			f = true;
 		}
-		if (y > max.getBlockY()) {
+		if (y > max.getY()) {
 			newPos.setY(newPos.getY() - 1);
 			f = true;
 		}
-		if (z < min.getBlockZ()) {
+		if (z < min.getZ()) {
 			newPos.setZ(newPos.getZ() + 1);
 			f = true;
 		}
-		if (z > max.getBlockZ()) {
+		if (z > max.getZ()) {
 			newPos.setZ(newPos.getZ() - 1);
 			f = true;
 		}
 		if (f) {
 			p.teleport(newPos);
-			Vector v = p.getVelocity();
-			p.setVelocity(new Vector(-v.getX(), -1, -v.getZ()));
 		}
 	}
 }

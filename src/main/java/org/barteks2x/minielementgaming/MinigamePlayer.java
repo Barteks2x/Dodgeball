@@ -6,9 +6,9 @@ public class MinigamePlayer {
 
 	private final MinigameTeam team;
 	private final Player player;
-	private final Minigame mg;
+	private final MinigameEnum mg;
 
-	public MinigamePlayer(Player player, MinigameTeam team, Minigame mg) {
+	public MinigamePlayer(Player player, MinigameTeam team, MinigameEnum mg) {
 		this.player = player;
 		this.team = team;
 		this.mg = mg;
@@ -22,7 +22,7 @@ public class MinigamePlayer {
 		return player;
 	}
 
-	public Minigame getMinigame() {
+	public MinigameEnum getMinigame() {
 		return mg;
 	}
 

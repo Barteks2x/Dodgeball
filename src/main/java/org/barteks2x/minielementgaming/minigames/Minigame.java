@@ -1,22 +1,25 @@
-package org.barteks2x.minielementgaming;
+package org.barteks2x.minielementgaming.minigames;
 
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import org.barteks2x.minielementgaming.*;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 
-public abstract class ArenaBase implements Serializable {
+public abstract class Minigame implements Serializable {
 
 	private static final long serialVersionUID = 342134832462L;
 	protected final CubeSerializable area;
-	protected final Minigame minigame;
-	protected final Map<String, MinigamePlayer> players;
-	protected final int[] teamPlayerCount;
+	protected final MinigameEnum minigame;
+	protected final transient Map<String, MinigamePlayer> players;
+	protected final transient int[] teamPlayerCount;
 
-	protected ArenaBase(Location minPoint, Location maxPoint, Minigame mg, byte teams) {
+	protected Minigame(Location minPoint, Location maxPoint, MinigameEnum mg, byte teams) {
 		if (teams <= 0) {
 			throw new IllegalArgumentException("Zreo or less teams!");
 		}
@@ -33,6 +36,10 @@ public abstract class ArenaBase implements Serializable {
 
 	public abstract void handlePlayerInteract(PlayerInteractEvent e);
 
+	public abstract void handleEntityDamageByEntity(EntityDamageByEntityEvent e);
+
+	public abstract void handleProjectileHitEvent(ProjectileHitEvent e);
+
 	public void addPlayer(Player player, MinigameTeam team) {
 		if (players.containsKey(player.getName())) {
 			return;
@@ -48,14 +55,14 @@ public abstract class ArenaBase implements Serializable {
 	}
 
 	public boolean isPlayerInArena(Player p) {
-		return area.isPlayerInArea(p);
+		return area.isInArea(p.getLocation());
 	}
 
 	public boolean isPlayerInMinigame(Player p) {
 		return players.containsKey(p.getName());
 	}
 
-	void removePlayer(Player player) {
+	public void removePlayer(Player player) {
 		players.remove(player.getName());
 	}
 
@@ -69,4 +76,6 @@ public abstract class ArenaBase implements Serializable {
 		}
 		return MinigameTeam.values()[team];
 	}
+
+	public abstract void onStart();
 }

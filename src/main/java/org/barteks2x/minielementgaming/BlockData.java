@@ -7,14 +7,20 @@ public class BlockData implements Serializable {
 	private static final long serialVersionUID = 4252365235623845L;
 	public final int id;
 	public final byte meta;
+	public final LocationSerializable loc;
 
 	public BlockData(int id) {
 		this(id, 0);
 	}
 
 	public BlockData(int id, int meta) {
+		this(id, meta, null);
+	}
+
+	public BlockData(int id, int meta, LocationSerializable loc) {
 		this.id = id;
 		this.meta = (byte)meta;
+		this.loc = loc;
 	}
 
 	public BlockData(String idMeta) {

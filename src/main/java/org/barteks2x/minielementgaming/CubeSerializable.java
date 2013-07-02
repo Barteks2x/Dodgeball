@@ -15,18 +15,11 @@ public class CubeSerializable implements Serializable {
 	}
 
 	public CubeSerializable(LocationSerializable minPoint, LocationSerializable maxPoint) {
-		//double x1 = minPoint.x;
-		//double y1 = minPoint.y;
-		//double z1 = minPoint.z;
-		//double x2 = maxPoint.x;
-		//double y2 = maxPoint.y;
-		//double z2 = maxPoint.z;
 		this.maxPoint = maxPoint;
 		this.minPoint = minPoint;
 	}
 
-	public boolean isPlayerInArea(Player p) {
-		Location l = p.getLocation();
+	public boolean isInArea(Location l) {
 		double x = l.getX();
 		double y = l.getY();
 		double z = l.getZ();
@@ -45,27 +38,27 @@ public class CubeSerializable implements Serializable {
 		Location min = minPoint.getLocation();
 		Location max = maxPoint.getLocation();
 		if (x < min.getX()) {
-			newPos.setX(newPos.getX() + 1);
+			newPos.setX(min.getX() + 1);
 			f = true;
 		}
 		if (x > max.getX()) {
-			newPos.setX(newPos.getX() - 1);
+			newPos.setX(max.getX() - 1);
 			f = true;
 		}
 		if (y < min.getY()) {
-			newPos.setY(newPos.getY() + 1);
+			newPos.setY(min.getY() + 1);
 			f = true;
 		}
 		if (y > max.getY()) {
-			newPos.setY(newPos.getY() - 1);
+			newPos.setY(max.getY() - 1);
 			f = true;
 		}
 		if (z < min.getZ()) {
-			newPos.setZ(newPos.getZ() + 1);
+			newPos.setZ(min.getZ() + 1);
 			f = true;
 		}
 		if (z > max.getZ()) {
-			newPos.setZ(newPos.getZ() - 1);
+			newPos.setZ(max.getZ() - 1);
 			f = true;
 		}
 		if (f) {

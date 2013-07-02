@@ -1,18 +1,23 @@
 package org.barteks2x.minielementgaming;
 
+import java.util.*;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class ArenaCreator extends BukkitRunnable {
 
-	Location minPoint, maxPoint;
-	BlockData floor, wall1, wall2, line;
-	int sectionHeight;
+	private Location minPoint, maxPoint;
+	private BlockData floor, wall1, wall2, line;
+	private int sectionHeight;
+	private List<BlockData> blockUpdates;
+	private final Plugin plugin;
+	private final World w;
 
 	public ArenaCreator(Location minPoint, Location maxPoint, BlockData floorBlock,
 			BlockData wallBlock1, BlockData wallBlock2, BlockData lineBlock,
-			int wallSectionHeight) {
+			int wallSectionHeight, Plugin plugin) {
+		this.blockUpdates = new LinkedList<BlockData>();
 		this.minPoint = minPoint;
 		this.maxPoint = maxPoint;
 		this.floor = floorBlock;
@@ -20,6 +25,8 @@ public class ArenaCreator extends BukkitRunnable {
 		this.wall2 = wallBlock2;
 		this.line = lineBlock;
 		this.sectionHeight = wallSectionHeight;
+		this.plugin = plugin;
+		this.w = minPoint.getWorld();
 	}
 
 	public void run() {
@@ -33,23 +40,28 @@ public class ArenaCreator extends BukkitRunnable {
 		for (int x = minX; x <= maxX; ++x) {
 			for (int y = minY; y <= maxY; ++y) {
 				for (int z = minZ; z <= maxZ; ++z) {
-					w.getBlockAt(x, y, z).setTypeIdAndData(0, (byte)0, false);
+					blockUpdates.add(new BlockData(0, 0, new LocationSerializable(w, x, y, z)));
 				}
 			}
 		}
 		for (int x = minX; x <= maxX; ++x) {
 			for (int z = minZ; z <= maxZ; ++z) {
-				w.getBlockAt(x, minY, z).setTypeIdAndData(floor.id, floor.meta, false);
+				blockUpdates.add(new BlockData(floor.id, floor.meta, new LocationSerializable(w, x,
+						minY, z)));
 			}
 		}
 		for (int x = minX; x <= maxX; ++x) {
 			for (int y = minY; y <= maxY; ++y) {
 				if (y < sectionHeight + minY) {
-					w.getBlockAt(x, y, minZ).setTypeIdAndData(wall1.id, wall1.meta, false);
-					w.getBlockAt(x, y, maxZ).setTypeIdAndData(wall1.id, wall1.meta, false);
+					blockUpdates.add(new BlockData(wall1.id, wall2.meta, new LocationSerializable(w,
+							x, y, minZ)));
+					blockUpdates.add(new BlockData(wall1.id, wall2.meta, new LocationSerializable(w,
+							x, y, maxZ)));
 				} else {
-					w.getBlockAt(x, y, minZ).setTypeIdAndData(wall2.id, wall2.meta, false);
-					w.getBlockAt(x, y, maxZ).setTypeIdAndData(wall2.id, wall2.meta, false);
+					blockUpdates.add(new BlockData(wall2.id, wall2.meta, new LocationSerializable(w,
+							x, y, minZ)));
+					blockUpdates.add(new BlockData(wall2.id, wall2.meta, new LocationSerializable(w,
+							x, y, maxZ)));
 				}
 
 			}
@@ -57,30 +69,68 @@ public class ArenaCreator extends BukkitRunnable {
 		for (int z = minZ; z <= maxZ; ++z) {
 			for (int y = minY; y <= maxY; ++y) {
 				if (y < sectionHeight + minY) {
-					w.getBlockAt(minX, y, z).setTypeIdAndData(wall1.id, wall1.meta, false);
-					w.getBlockAt(maxX, y, z).setTypeIdAndData(wall1.id, wall1.meta, false);
+					blockUpdates.add(new BlockData(wall1.id, wall1.meta, new LocationSerializable(w,
+							minX, y, z)));
+					blockUpdates.add(new BlockData(wall1.id, wall1.meta, new LocationSerializable(w,
+							maxX, y, z)));
 				} else {
-					w.getBlockAt(minX, y, z).setTypeIdAndData(wall2.id, wall2.meta, false);
-					w.getBlockAt(maxX, y, z).setTypeIdAndData(wall2.id, wall2.meta, false);
+					blockUpdates.add(new BlockData(wall2.id, wall2.meta, new LocationSerializable(w,
+							minX, y, z)));
+					blockUpdates.add(new BlockData(wall2.id, wall2.meta, new LocationSerializable(w,
+							maxX, y, z)));
 				}
 			}
 		}
 		if ((minX + maxX) % 2 == 0) {
 			int lineX = (minX + maxX) / 2;
 			for (int z = minZ; z <= maxZ; ++z) {
-				w.getBlockAt(lineX, minY, z).setTypeIdAndData(line.id, line.meta, false);
+				blockUpdates.add(new BlockData(line.id, line.meta,
+						new LocationSerializable(w, lineX, minY, z)));
 			}
 		} else {
 			int lineX1 = (minX + maxX) / 2;
-			int lineX2 = (minX + maxX) / 2 + sgn(lineX1);//I have no idea why it must be Math.signum, if I change it to 1 (-1) line is shifted by one on negative/positive positions
+			int lineX2 = (minX + maxX) / 2 + sgn(lineX1);//I have no idea why it must be Math.signum, if it is 1 or -1 line is shifted by one on negative/positive X positions
 			for (int z = minZ; z <= maxZ; ++z) {
-				w.getBlockAt(lineX1, minY, z).setTypeIdAndData(line.id, line.meta, false);
-				w.getBlockAt(lineX2, minY, z).setTypeIdAndData(line.id, line.meta, false);
+				blockUpdates.add(new BlockData(line.id, line.meta,
+						new LocationSerializable(w, lineX1, minY, z)));
+				blockUpdates.add(new BlockData(line.id, line.meta,
+						new LocationSerializable(w, lineX2, minY, z)));
 			}
 		}
+		runTasks();
 	}
 
 	private static int sgn(int x) {
 		return x < 0 ? -1 : 1;
+	}
+
+	private void runTasks() {
+		final Iterator<BlockData> it = blockUpdates.iterator();
+		final BukkitRunnable t = this;
+		while (it.hasNext()) {
+			new BukkitRunnable() {
+				public void run() {
+					synchronized (t) {
+						for (int i = 0; i < 4096; ++i) {
+							if (it.hasNext()) {
+								BlockData b = it.next();
+								Location l = b.loc.getLocation();
+								w.getBlockAt(l.getBlockX(), l.getBlockY(), l.getBlockZ()).
+										setTypeIdAndData(b.id, b.meta, false);
+							}
+						}
+
+						t.notify();//Exception...
+					}
+
+				}
+			}.runTaskLater(plugin, 1);
+			synchronized (t) {
+				try {
+					t.wait();
+				} catch (InterruptedException ex) {
+				}
+			}
+		}
 	}
 }

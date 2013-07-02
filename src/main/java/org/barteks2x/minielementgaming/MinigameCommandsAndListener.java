@@ -4,15 +4,20 @@ import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.selections.Selection;
 import java.util.*;
 import java.util.logging.Level;
+import org.barteks2x.minielementgaming.minigames.Minigame;
+import org.barteks2x.minielementgaming.minigames.MinigameDodgeball;
 import org.bukkit.Location;
 import org.bukkit.command.*;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Snowball;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 
-public class MinigameLogic implements CommandExecutor, Listener {
+public class MinigameCommandsAndListener implements CommandExecutor, Listener {
 
 	private final Plugin plugin;
 	private final WorldEditPlugin worldedit;
@@ -23,11 +28,11 @@ public class MinigameLogic implements CommandExecutor, Listener {
 	private final String noselectionmsg = "Nothing selected. You must select arena!";
 	private final String toosmallarenamsg = "Too small arena! Arena must be at least " +
 			minArenaSizeXZ + "x" + minArenaSizeY + "x" + minArenaSizeXZ;
-	public final Map<String, ArenaBase> minigames = new HashMap<String, ArenaBase>();
+	public final Map<String, Minigame> minigames = new HashMap<String, Minigame>();
 	public final Map<String, String> players = new HashMap<String, String>();
-	private ArenaBase selectedArena;
+	private Minigame selectedArena;
 
-	MinigameLogic(Plugin plugin, WorldEditPlugin worldedit) {
+	MinigameCommandsAndListener(Plugin plugin, WorldEditPlugin worldedit) {
 		this.plugin = plugin;
 		this.worldedit = worldedit;
 	}
@@ -39,7 +44,7 @@ public class MinigameLogic implements CommandExecutor, Listener {
 		if (a == null) {
 			return;
 		}
-		ArenaBase ab = minigames.get(a);
+		Minigame ab = minigames.get(a);
 		if (ab == null) {
 			plugin.getLogger().log(Level.WARNING, "Error! Couldn't find player in minigame arena!");
 			return;
@@ -50,6 +55,32 @@ public class MinigameLogic implements CommandExecutor, Listener {
 	@EventHandler
 	public void onPlayerInteract(PlayerInteractEvent e) {
 		//TODO onPlayerInteract
+	}
+
+	@EventHandler
+	public void onEntityDamageEntity(EntityDamageByEntityEvent e) {
+		if (e.getEntity() instanceof Player) {
+			if (e.getDamager() instanceof Snowball) {
+				Player p = (Player)e.getEntity();
+				if (players.containsKey(p.getName())) {
+					Minigame m = minigames.get(players.get(p.getName()));
+					if (m != null) {
+						m.handleEntityDamageByEntity(e);
+					} else {
+						plugin.getLogger().log(Level.WARNING,
+								"Error! Couldn't find player in minigame arena!");
+					}
+				}
+			}
+		}
+	}
+
+	@EventHandler
+	public void onProjectileHit(ProjectileHitEvent e) {
+		Object[] games = minigames.values().toArray();
+		for (Object g : games) {
+			((Minigame)g).handleProjectileHitEvent(e);
+		}
 	}
 
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
@@ -76,8 +107,25 @@ public class MinigameLogic implements CommandExecutor, Listener {
 			sender.sendMessage("This command must be executed by player");
 			return true;
 		}
-		players.put(((Player)sender).getName(), "example");
-		minigames.get("example").addPlayer((Player)sender);
+		if (!args.hasNext()) {
+			sender.sendMessage("No minigame specified!");
+			return true;
+		}
+		String n = args.next();
+		String p = ((Player)sender).getName();
+		if (players.containsKey(n)) {
+			sender.sendMessage("You can't join two minigames! Use /leave to leave current minigame");
+			return true;
+		}
+		Minigame m = minigames.get(n);
+		if (m == null) {
+			sender.sendMessage(
+					"Minigame not exist! Are you sure name is correct?\"Mini\" and \"MiNi\" are different minigames!");
+			return true;
+		}
+		players.put(((Player)sender).getName(), n);
+		m.addPlayer((Player)sender);
+		sender.sendMessage("Joined to minigame: " + n);
 		return true;
 	}
 
@@ -91,6 +139,9 @@ public class MinigameLogic implements CommandExecutor, Listener {
 		}
 		if ("arena".equalsIgnoreCase(par)) {
 			return arena(sender, args);
+		}
+		if ("automake".equalsIgnoreCase(par)) {
+			return autobuild(sender, args);
 		}
 		if ("create".equalsIgnoreCase(par) || "c".equalsIgnoreCase(par)) {
 			return create(sender, args);
@@ -126,6 +177,8 @@ public class MinigameLogic implements CommandExecutor, Listener {
 		}
 		players.remove(((Player)sender).getName());
 		minigames.get("example").removePlayer((Player)sender);
+		sender.sendMessage("Left ciurrent minigame");
+		//TODO tp to spawn after minigame
 		return true;
 	}
 
@@ -136,14 +189,11 @@ public class MinigameLogic implements CommandExecutor, Listener {
 	private boolean arena(CommandSender sender, Iterator<String> args) {
 		if (!args.hasNext()) {
 			sender.sendMessage(new String[]{"Usage: /minigame arena <command>\n",
-				"Avalble arena commands: autobuild, select, savestate, rebuild\n",
+				"Avalble arena commands: select, savestate, rebuild\n",
 				"/minigame halp arena for more information"});
 			return true;
 		}
 		String par = args.next();
-		if ("autobuild".equalsIgnoreCase(par)) {
-			return autobuild(sender, args);
-		}
 		if ("select".equalsIgnoreCase(par)) {
 			return select(sender, args);
 		}
@@ -172,7 +222,13 @@ public class MinigameLogic implements CommandExecutor, Listener {
 	}
 
 	private boolean start(CommandSender sender, Iterator<String> args) {
-		//TODO Auto-generated method
+		if (!args.hasNext()) {
+			sender.sendMessage(noargsmsg);
+			return true;
+		}
+		String name = args.next();
+		Minigame m = minigames.get(name);
+		m.onStart();
 		return false;
 	}
 
@@ -187,6 +243,52 @@ public class MinigameLogic implements CommandExecutor, Listener {
 	}
 
 	private boolean autobuild(CommandSender sender, Iterator<String> args) {
+		if (!args.hasNext()) {
+			sender.sendMessage(noargsmsg);
+			return true;
+		}
+		String type = args.next();
+		if ("db".equalsIgnoreCase(type) || "dodgeball".equalsIgnoreCase(type)) {
+			return autobuildDB(sender, args);
+		}
+		return false;
+	}
+
+	private boolean select(CommandSender sender, Iterator<String> args) {
+		//TODO Auto-generated method
+		return false;
+	}
+
+	private boolean savestate(CommandSender sender) {
+		//TODO Auto-generated method
+		return false;
+	}
+
+	private boolean rebuild(CommandSender sender) {
+		//TODO Auto-generated method
+		return false;
+	}
+
+	private boolean autobuildDB(CommandSender sender, Iterator<String> args) {
+		if (!args.hasNext()) {
+			sender.sendMessage(noargsmsg);
+			return true;
+		}
+		String teamsString = args.next();
+		String teams[] = teamsString.split(":");
+		if (teams.length != 2) {
+			sender.sendMessage("Wrong paraneter: " + teamsString);
+			return true;
+		}
+		MinigameTeam team1, team2;
+		try {
+			team1 = MinigameTeam.valueOf(teams[0]);
+			team2 = MinigameTeam.valueOf(teams[1]);
+		} catch (IllegalArgumentException ex) {
+			sender.sendMessage("Incorrect color");
+			return true;
+		}
+
 		Selection sel = worldedit.getSelection((Player)sender);
 		if (sel == null) {
 			sender.sendMessage(noselectionmsg);
@@ -199,6 +301,11 @@ public class MinigameLogic implements CommandExecutor, Listener {
 		}
 		Location maxPoint = sel.getMaximumPoint();
 		Location minPoint = sel.getMinimumPoint();
+		if (!args.hasNext()) {
+			sender.sendMessage(noargsmsg);
+			return true;
+		}
+		String name = args.next();
 		BlockData[] blocks = new BlockData[4];
 		for (int i = 0; i < blocks.length; ++i) {
 			if (!args.hasNext()) {
@@ -226,26 +333,11 @@ public class MinigameLogic implements CommandExecutor, Listener {
 			return true;
 		}
 		ArenaCreator creator = new ArenaCreator(minPoint, maxPoint, blocks[0],
-				blocks[1], blocks[2], blocks[3], sectionHeight);
-		creator.runTaskLater(plugin, 1);//avoid lag when command is executed
-		ArenaBase arena = new DodgeBallArena(minPoint, maxPoint);
+				blocks[1], blocks[2], blocks[3], sectionHeight, plugin);
+		creator.runTaskAsynchronously(plugin);//avoid lag when command is executed
+		Minigame arena = new MinigameDodgeball(minPoint, maxPoint, name, team1, team2);
 		selectedArena = arena;
 		minigames.put("example", arena);
 		return true;
-	}
-
-	private boolean select(CommandSender sender, Iterator<String> args) {
-		//TODO Auto-generated method
-		return false;
-	}
-
-	private boolean savestate(CommandSender sender) {
-		//TODO Auto-generated method
-		return false;
-	}
-
-	private boolean rebuild(CommandSender sender) {
-		//TODO Auto-generated method
-		return false;
 	}
 }

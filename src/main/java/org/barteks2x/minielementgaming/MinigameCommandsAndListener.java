@@ -87,16 +87,10 @@ public class MinigameCommandsAndListener implements CommandExecutor, Listener {
 		List<String> paramList = new LinkedList<String>();
 		Utils.addArrayToList(paramList, args);
 		Iterator<String> it = paramList.iterator();
-		if ("meg".equalsIgnoreCase(cmd.getName())) {
+		if ("db".equalsIgnoreCase(cmd.getName())) {
 			return minigame(sender, it);
 		}
-		if ("join".equalsIgnoreCase(cmd.getName())) {
-			return join(sender, it);
-		}
-		if ("leave".equalsIgnoreCase(cmd.getName())) {
-			return leave(sender);
-		}
-		if ("mghelp".equalsIgnoreCase(cmd.getName())) {
+		if ("dbhelp".equalsIgnoreCase(cmd.getName())) {
 			return help(sender, it);
 		}
 		return false;
@@ -137,9 +131,6 @@ public class MinigameCommandsAndListener implements CommandExecutor, Listener {
 		if ("reload-config".equalsIgnoreCase(par) || "rc".equalsIgnoreCase(par)) {
 			return reloadConfig(sender);
 		}
-		if ("arena".equalsIgnoreCase(par)) {
-			return arena(sender, args);
-		}
 		if ("automake".equalsIgnoreCase(par)) {
 			return autobuild(sender, args);
 		}
@@ -167,43 +158,35 @@ public class MinigameCommandsAndListener implements CommandExecutor, Listener {
 		if ("help".equalsIgnoreCase(par)) {
 			help(sender, args);
 		}
+		if ("save".equalsIgnoreCase(par)) {
+			savestate(sender);
+		}
+		if ("setspawn".equalsIgnoreCase(par)) {
+			return setSpawn(sender, args);
+		}
 		return false;
 	}
 
 	private boolean leave(CommandSender sender) {
 		if (!(sender instanceof Player)) {
-			sender.sendMessage("This command must be executed by player");
+			sender.sendMessage("This command must be used by player");
 			return true;
 		}
+		String mg = players.get(((Player)sender).getName());
 		players.remove(((Player)sender).getName());
-		minigames.get("example").removePlayer((Player)sender);
-		sender.sendMessage("Left ciurrent minigame");
+		Minigame mgi = minigames.get(mg);
+		if (mgi != null) {
+			mgi.removePlayer((Player)sender);
+		} else {
+			sender.sendMessage("You arent in any active minigame!");
+		}
+		sender.sendMessage("Left ciurrent minigame.");
 		//TODO tp to spawn after minigame
 		return true;
 	}
 
 	private boolean help(CommandSender sender, Iterator<String> args) {
 		return false;//TODO help
-	}
-
-	private boolean arena(CommandSender sender, Iterator<String> args) {
-		if (!args.hasNext()) {
-			sender.sendMessage(new String[]{"Usage: /minigame arena <command>\n",
-				"Avalble arena commands: select, savestate, rebuild\n",
-				"/minigame halp arena for more information"});
-			return true;
-		}
-		String par = args.next();
-		if ("select".equalsIgnoreCase(par)) {
-			return select(sender, args);
-		}
-		if ("savestate".equalsIgnoreCase(par)) {
-			return savestate(sender);
-		}
-		if ("rebuild".equalsIgnoreCase(par) || "loadstate".equalsIgnoreCase(par)) {
-			return rebuild(sender);
-		}
-		return false;
 	}
 
 	private boolean reloadConfig(CommandSender sender) {
@@ -242,18 +225,6 @@ public class MinigameCommandsAndListener implements CommandExecutor, Listener {
 		return false;
 	}
 
-	private boolean autobuild(CommandSender sender, Iterator<String> args) {
-		if (!args.hasNext()) {
-			sender.sendMessage(noargsmsg);
-			return true;
-		}
-		String type = args.next();
-		if ("db".equalsIgnoreCase(type) || "dodgeball".equalsIgnoreCase(type)) {
-			return autobuildDB(sender, args);
-		}
-		return false;
-	}
-
 	private boolean select(CommandSender sender, Iterator<String> args) {
 		//TODO Auto-generated method
 		return false;
@@ -269,7 +240,7 @@ public class MinigameCommandsAndListener implements CommandExecutor, Listener {
 		return false;
 	}
 
-	private boolean autobuildDB(CommandSender sender, Iterator<String> args) {
+	private boolean autobuild(CommandSender sender, Iterator<String> args) {
 		if (!args.hasNext()) {
 			sender.sendMessage(noargsmsg);
 			return true;
@@ -337,7 +308,23 @@ public class MinigameCommandsAndListener implements CommandExecutor, Listener {
 		creator.runTaskAsynchronously(plugin);//avoid lag when command is executed
 		Minigame arena = new MinigameDodgeball(minPoint, maxPoint, name, team1, team2);
 		selectedArena = arena;
-		minigames.put("example", arena);
+		minigames.put(name, arena);
+		sender.sendMessage("Building dodgeball arena...");
+		return true;
+	}
+
+	private boolean setSpawn(CommandSender sender, Iterator<String> args) {
+		if (!(sender instanceof Player)) {
+			sender.sendMessage("This command can be used only by player");
+			return true;
+		}
+		if (!args.hasNext()) {
+			sender.sendMessage("No minigame name specified!");
+			return true;
+		}
+		String name = args.next();
+		minigames.get(name).setSpawn(((Player)sender).getLocation());
+		sender.sendMessage("Dodgeball spawn set: " + ((Player)sender).getLocation().toString());
 		return true;
 	}
 }

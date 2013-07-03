@@ -18,6 +18,8 @@ public abstract class Minigame implements Serializable {
 	protected final MinigameEnum minigame;
 	protected final transient Map<String, MinigamePlayer> players;
 	protected final transient int[] teamPlayerCount;
+	protected final int[] teamIdMap;
+	protected LocationSerializable spawn;
 
 	protected Minigame(Location minPoint, Location maxPoint, MinigameEnum mg, byte teams) {
 		if (teams <= 0) {
@@ -30,6 +32,7 @@ public abstract class Minigame implements Serializable {
 		this.area = new CubeSerializable(minPoint, maxPoint);
 		this.minigame = mg;
 		teamPlayerCount = new int[teams];
+		teamIdMap = new int[teams];
 	}
 
 	public abstract void handlePlayerMove(PlayerMoveEvent e);
@@ -51,7 +54,8 @@ public abstract class Minigame implements Serializable {
 		if (players.containsKey(player.getName())) {
 			return;
 		}
-		players.put(player.getName(), new MinigamePlayer(player, autoSelectTeam(), minigame));
+		players.put(player.getName(),
+				new MinigamePlayer(player, autoSelectTeam(teamIdMap), minigame));
 	}
 
 	public boolean isPlayerInArena(Player p) {
@@ -63,18 +67,25 @@ public abstract class Minigame implements Serializable {
 	}
 
 	public void removePlayer(Player player) {
+		player.teleport(spawn.getLocation());
 		players.remove(player.getName());
 	}
 
-	private MinigameTeam autoSelectTeam() {
+	protected MinigameTeam autoSelectTeam(int[] teamIdMap) {
 		int lowest = Integer.MAX_VALUE;
 		int team = 0;
 		for (int i = 0; i < teamPlayerCount.length; ++i) {
 			if (teamPlayerCount[i] < lowest) {
 				team = i;
+				lowest = teamPlayerCount[i];
 			}
 		}
-		return MinigameTeam.values()[team];
+		teamPlayerCount[team] = lowest + 1;
+		return MinigameTeam.values()[teamIdMap[team]];
+	}
+
+	public void setSpawn(Location loc) {
+		this.spawn = new LocationSerializable(loc);
 	}
 
 	public abstract void onStart();

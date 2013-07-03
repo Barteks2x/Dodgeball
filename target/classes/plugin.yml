@@ -1,5 +1,5 @@
 name: MiniElementGamingDodgeballPlugin
-version: 0.1
+version: 0.1-1-g1ca6d47
 description: Plugin for MiniElementGaming Minecraft server
 author: Barteks2x
 main: org.barteks2x.minielementgaming.Plugin

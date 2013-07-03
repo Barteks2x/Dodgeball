@@ -16,10 +16,8 @@ public class Plugin extends JavaPlugin {
 		CommandExecutor exec = new MinigameCommandsAndListener(this, worldedit);
 		Listener l = (Listener)exec;
 		getServer().getPluginManager().registerEvents(l, this);
-		getCommand("meg").setExecutor(exec);
-		getCommand("join").setExecutor(exec);
-		getCommand("leave").setExecutor(exec);
-		getCommand("mghelp").setExecutor(exec);
+		getCommand("db").setExecutor(exec);
+		getCommand("dbhelp").setExecutor(exec);
 	}
 
 	@Override

@@ -12,11 +12,8 @@ commands:
         Use /db help <subcommand> [<subcommand2>] or /mghelp for more information
         <something> - required parameter
         [<something>] - optional parameter
-        /db reload-config OR rc - reload minigame config
-        /db automake <TEAM1-COLOR:TEAM2-COLOR> <name> <floor-id>[:<meta>] 
-            <wall-id1>[:<meta>] <wall-id2>[:<meta>] <line-id>[:<meta>] height - 
-                  build arena in worldedit selection. Example: 
-                  /db arena autobuild minigame1 /db 5:3 35:11 20 89 3
+        /db reload-config - reload minigame config
+        /db automake <TEAM1-COLOR:TEAM2-COLOR> <name> <floor-id>[:<meta>] <wall-id1>[:<meta>] <wall-id2>[:<meta>] <line-id>[:<meta>] height - build arena in worldedit selection. Example: /db arena autobuild minigame1 /db 5:3 35:11 20 89 3
         /db save <minigame-name> [<on-start-auto-rebuild(true/false)>] - save current arena state (minigame MUST be created)
         /db delete <name>
         /db start <name>
@@ -24,7 +21,7 @@ commands:
         /db kickplayer <minigame-name> <player>
         /db join <name> - join minigame
         /db leave - leave minigame
-    permission: minigame
+    permission: db
   dbhelp:
     description: Minigame halp
     usage: /dbhelp [<subcommand1>] [<subcommand2>]

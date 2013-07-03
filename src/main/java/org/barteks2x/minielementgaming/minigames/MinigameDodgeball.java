@@ -121,7 +121,7 @@ public class MinigameDodgeball extends Minigame {
 		if (e.getEntity() instanceof Snowball) {
 			Snowball s = (Snowball)e.getEntity();
 			if (area.isInArea(s.getLocation())) {
-				s.getWorld().dropItem(s.getLocation(), new ItemStack(Material.SNOW_BALL));
+				s.getWorld().dropItem(s.getLocation(), new ItemStack(Material.SNOW_BALL, 2));
 				s.remove();
 			}
 		}
@@ -143,9 +143,16 @@ public class MinigameDodgeball extends Minigame {
 
 	@Override
 	protected MinigameTeam autoSelectTeam(int[] teamIdMap) {
-		if (rand.nextBoolean()) {
+		if (teamPlayerCount[0] > teamPlayerCount[1]) {
+			teamPlayerCount[1]++;
+			return MinigameTeam.values()[teamIdMap[1]];
+		}
+		if (teamPlayerCount[0] < teamPlayerCount[1]) {
+			teamPlayerCount[0]++;
 			return MinigameTeam.values()[teamIdMap[0]];
 		}
-		return MinigameTeam.values()[teamIdMap[1]];
+
+		return rand.nextBoolean() ? MinigameTeam.values()[teamIdMap[0]] :
+				MinigameTeam.values()[teamIdMap[1]];
 	}
 }

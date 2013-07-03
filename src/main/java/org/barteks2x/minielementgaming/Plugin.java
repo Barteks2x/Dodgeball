@@ -17,7 +17,6 @@ public class Plugin extends JavaPlugin {
 		Listener l = (Listener)exec;
 		getServer().getPluginManager().registerEvents(l, this);
 		getCommand("db").setExecutor(exec);
-		getCommand("dbhelp").setExecutor(exec);
 	}
 
 	@Override

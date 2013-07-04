@@ -1,21 +1,25 @@
 package com.github.barteks2x.minielementgaming;
 
+import com.github.barteks2x.minielementgaming.minigames.Minigame;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 class PlayerData {
 
-	private Player p;
-	private ItemStack[] inventory;
-	private int health;
-	private float exp;
-	private ItemStack[] armor;
-	private float exhausion;
-	private int food;
-	private int maxHealth;
+	private final Player p;
+	private final ItemStack[] inventory;
+	private final int health;
+	private final float exp;
+	private final ItemStack[] armor;
+	private final float exhausion;
+	private final int food;
+	private final int maxHealth;
+	private final Location loc;
+	private final Minigame m;
 
-	public PlayerData(Player p) {
-		this.p = p;
+	public PlayerData(MinigamePlayer mp) {
+		this.p = mp.getPlayer();
 		this.inventory = p.getInventory().getContents();
 		this.health = p.getHealth();
 		this.exp = p.getExp();
@@ -23,6 +27,8 @@ class PlayerData {
 		this.exhausion = p.getExhaustion();
 		this.food = p.getFoodLevel();
 		this.maxHealth = p.getMaxHealth();
+		this.loc = p.getLocation();
+		this.m = mp.getMinigame();
 	}
 
 	public void restorePlayerData() {
@@ -33,5 +39,10 @@ class PlayerData {
 		p.setFoodLevel(food);
 		p.setMaxHealth(maxHealth);
 		p.setHealth(health);
+		if (m.getSpawn() != null) {
+			p.teleport(m.getSpawn());
+		} else {
+			p.teleport(loc);
+		}
 	}
 }

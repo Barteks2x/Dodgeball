@@ -18,7 +18,7 @@ public class MinigameManager implements Listener {
 		if (players.containsValue(p)) {
 			return false;
 		}
-		playersData.put(p.getPlayer().getName(), new PlayerData(p.getPlayer()));
+		playersData.put(p.getPlayer().getName(), new PlayerData(p));
 		players.put(p.getPlayer().getName(), p);
 		p.getMinigame().players.add(p);
 		return true;

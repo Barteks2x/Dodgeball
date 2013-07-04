@@ -15,11 +15,11 @@ public class Plugin extends JavaPlugin {
 	@Override
 	public void onEnable() {
 		worldedit = (WorldEditPlugin)Bukkit.getServer().getPluginManager().getPlugin("WorldEdit");
+		mm = new MinigameManager(this);
 		CommandExecutor exec = new MinigameCommandsAndListener(this, worldedit);
 		Listener l = (Listener)exec;
 		getServer().getPluginManager().registerEvents(l, this);
 		getCommand("db").setExecutor(exec);
-		mm = new MinigameManager(this);
 		getServer().getPluginManager().registerEvents(mm, this);
 	}
 

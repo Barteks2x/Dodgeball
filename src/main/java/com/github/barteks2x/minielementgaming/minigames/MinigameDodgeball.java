@@ -109,7 +109,7 @@ public class MinigameDodgeball extends Minigame {
 		if (e.getEntity() instanceof Snowball) {
 			Snowball s = (Snowball)e.getEntity();
 			if (area.isInArea(s.getLocation())) {
-				s.getWorld().dropItem(s.getLocation(), new ItemStack(Material.SNOW_BALL, 2));
+				s.getWorld().dropItem(s.getLocation(), new ItemStack(Material.SNOW_BALL, 1));
 				s.remove();
 			}
 		}

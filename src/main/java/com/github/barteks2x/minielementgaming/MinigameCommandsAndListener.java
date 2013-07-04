@@ -30,7 +30,7 @@ public class MinigameCommandsAndListener implements CommandExecutor, Listener {
 	private Minigame selectedArena;
 	private final MinigameManager mm;
 
-	MinigameCommandsAndListener(Plugin plugin, WorldEditPlugin worldedit) {
+	public MinigameCommandsAndListener(Plugin plugin, WorldEditPlugin worldedit) {
 		this.plugin = plugin;
 		this.worldedit = worldedit;
 		this.mm = plugin.getMinigameManager();

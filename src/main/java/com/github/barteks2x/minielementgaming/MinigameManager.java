@@ -9,17 +9,28 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 
 public class MinigameManager implements Listener {
 
-	private final Map<String, Minigame> minigames = new HashMap<String, Minigame>();//MinigameName-Minigame
-	private final Map<String, MinigamePlayer> players = new HashMap<String, MinigamePlayer>();
-	private final Map<String, PlayerData> playersData = new HashMap<String, PlayerData>();
+	private final Map<String, Minigame> minigames;
+	private final Map<String, MinigamePlayer> players;
+	private final Map<String, PlayerData> playersData;
+	private final Plugin plug;
+
+	public MinigameManager(Plugin plug) {
+		this.playersData = new HashMap<String, PlayerData>(plug.getServer().getMaxPlayers());
+		this.players = new HashMap<String, MinigamePlayer>(plug.getServer().getMaxPlayers());
+		this.minigames = new HashMap<String, Minigame>(5);
+		this.plug = plug;
+	}
 
 	public boolean addPlayer(MinigamePlayer p) {
 		//Minigame is added to manager in constructor
 		if (players.containsValue(p)) {
 			return false;
 		}
-		playersData.put(p.getPlayer().getName(), new PlayerData(p));
-		players.put(p.getPlayer().getName(), p);
+		Player pl = p.getPlayer();
+		playersData.put(pl.getName(), new PlayerData(p));
+		players.put(pl.getName(), p);
+		pl.getInventory().clear();
+		pl.getEquipment().clear();
 		p.getMinigame().players.add(p);
 		return true;
 	}

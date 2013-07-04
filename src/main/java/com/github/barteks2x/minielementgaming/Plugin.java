@@ -19,7 +19,7 @@ public class Plugin extends JavaPlugin {
 		Listener l = (Listener)exec;
 		getServer().getPluginManager().registerEvents(l, this);
 		getCommand("db").setExecutor(exec);
-		mm = new MinigameManager();
+		mm = new MinigameManager(this);
 		getServer().getPluginManager().registerEvents(mm, this);
 	}
 

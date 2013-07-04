@@ -1,6 +1,5 @@
-package com.github.barteks2x.minielementgaming;
+package com.github.barteks2x.dodgeball;
 
-import com.github.barteks2x.minielementgaming.minigames.Minigame;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;

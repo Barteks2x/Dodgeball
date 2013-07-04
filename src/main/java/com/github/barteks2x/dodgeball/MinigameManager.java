@@ -1,6 +1,5 @@
-package com.github.barteks2x.minielementgaming;
+package com.github.barteks2x.dodgeball;
 
-import com.github.barteks2x.minielementgaming.minigames.Minigame;
 import java.util.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -47,9 +46,10 @@ public class MinigameManager implements Listener {
 		if (!players.containsValue(p)) {
 			return false;
 		}
-		Minigame m = players.get(p).getMinigame();
-		DodgeballTeam[] teamMapping = DodgeballTeam.values();
-		p.getPlayer().teleport(p.getMinigame().getSpawn());
+		Minigame m = p.getMinigame();
+		if (m.getSpawn() != null) {
+			p.getPlayer().teleport(p.getMinigame().getSpawn());
+		}
 		playersData.get(p.getPlayer().getName()).restorePlayerData();
 		players.remove(p.getPlayer().getName());
 		p.getMinigame().players.remove(p);

@@ -1,4 +1,4 @@
-package com.github.barteks2x.minielementgaming;
+package com.github.barteks2x.dodgeball;
 
 public enum DodgeballTeam {
 

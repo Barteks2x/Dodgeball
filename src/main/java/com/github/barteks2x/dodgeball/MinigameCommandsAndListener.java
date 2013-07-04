@@ -1,7 +1,5 @@
-package com.github.barteks2x.minielementgaming;
+package com.github.barteks2x.dodgeball;
 
-import com.github.barteks2x.minielementgaming.minigames.Minigame;
-import com.github.barteks2x.minielementgaming.minigames.Dodgeball;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.selections.Selection;
 import java.util.*;

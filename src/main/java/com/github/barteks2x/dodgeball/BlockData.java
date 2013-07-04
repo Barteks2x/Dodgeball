@@ -1,4 +1,4 @@
-package com.github.barteks2x.minielementgaming;
+package com.github.barteks2x.dodgeball;
 
 import java.io.Serializable;
 

@@ -1,4 +1,4 @@
-package com.github.barteks2x.minielementgaming;
+package com.github.barteks2x.dodgeball;
 
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import java.util.logging.Logger;

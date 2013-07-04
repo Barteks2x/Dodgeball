@@ -1,6 +1,11 @@
-package com.github.barteks2x.minielementgaming.minigames;
+package com.github.barteks2x.dodgeball;
 
-import com.github.barteks2x.minielementgaming.*;
+import com.github.barteks2x.dodgeball.DodgeballTeam;
+import com.github.barteks2x.dodgeball.LocationSerializable;
+import com.github.barteks2x.dodgeball.Plugin;
+import com.github.barteks2x.dodgeball.MinigameEnum;
+import com.github.barteks2x.dodgeball.CubeSerializable;
+import com.github.barteks2x.dodgeball.DodgeballPlayer;
 import java.util.Random;
 import org.bukkit.*;
 import org.bukkit.entity.Player;

@@ -68,6 +68,9 @@ public abstract class Minigame implements Serializable {
 	}
 
 	public Location getSpawn() {
+		if (spawn == null) {
+			return null;
+		}
 		return spawn.getLocation();
 	}
 

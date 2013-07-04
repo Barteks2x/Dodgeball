@@ -5,15 +5,16 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-public class MinigamePlayer {
+public class DodgeballPlayer {
 
-	private final MinigameTeam team;
+	private final DodgeballTeam team;
 	private final Player player;
 	public int health;
 	private double spawnX;
 	private final Minigame m;
+	private final int minigameteamIDmap;
 
-	public MinigamePlayer(Player player, MinigameTeam team, Minigame mg) {
+	public DodgeballPlayer(Player player, DodgeballTeam team, Minigame mg) {
 
 		this.player = player;
 		this.team = team;
@@ -23,9 +24,10 @@ public class MinigamePlayer {
 		player.getInventory().setHelmet(new ItemStack(Material.WOOL, 1, (short)team.ordinal()));
 		health = 6;
 		spawnX = mg.getSpawnX(this);
+		minigameteamIDmap = (DodgeballTeam.values()[mg.teamIdMap[0]] == team) ? 0 : 1;
 	}
 
-	public MinigameTeam getTeam() {
+	public DodgeballTeam getTeam() {
 		return team;
 	}
 

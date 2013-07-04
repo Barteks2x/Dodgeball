@@ -13,11 +13,11 @@ import org.bukkit.event.player.PlayerMoveEvent;
 public abstract class Minigame implements Serializable {
 
 	private static final long serialVersionUID = 342134832462L;
-	public transient final List<MinigamePlayer> players = new ArrayList<MinigamePlayer>();
+	public transient final List<DodgeballPlayer> players = new ArrayList<DodgeballPlayer>();
 	protected final CubeSerializable area;
 	protected final MinigameEnum minigame;
-	protected final transient int[] teamPlayerCount;
-	protected final int[] teamIdMap;
+	public final transient int[] teamPlayerCount;
+	public final int[] teamIdMap;
 	protected LocationSerializable spawn;
 	protected final String name;
 	protected final Plugin plug;
@@ -50,7 +50,7 @@ public abstract class Minigame implements Serializable {
 
 	public abstract void handleProjectileHitEvent(ProjectileHitEvent e);
 
-	public MinigameTeam autoSelectTeam() {
+	public DodgeballTeam autoSelectTeam() {
 		int lowest = Integer.MAX_VALUE;
 		int team = 0;
 		for (int i = 0; i < teamPlayerCount.length; ++i) {
@@ -60,7 +60,7 @@ public abstract class Minigame implements Serializable {
 			}
 		}
 		teamPlayerCount[team] = lowest + 1;
-		return MinigameTeam.values()[teamIdMap[team]];
+		return DodgeballTeam.values()[teamIdMap[team]];
 	}
 
 	public void setSpawn(Location loc) {
@@ -80,5 +80,5 @@ public abstract class Minigame implements Serializable {
 
 	public abstract void onStart();
 
-	public abstract double getSpawnX(MinigamePlayer p);
+	public abstract double getSpawnX(DodgeballPlayer p);
 }

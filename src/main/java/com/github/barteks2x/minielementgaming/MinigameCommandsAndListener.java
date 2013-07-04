@@ -1,7 +1,7 @@
 package com.github.barteks2x.minielementgaming;
 
 import com.github.barteks2x.minielementgaming.minigames.Minigame;
-import com.github.barteks2x.minielementgaming.minigames.MinigameDodgeball;
+import com.github.barteks2x.minielementgaming.minigames.Dodgeball;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.selections.Selection;
 import java.util.*;
@@ -231,10 +231,10 @@ public class MinigameCommandsAndListener implements CommandExecutor, Listener {
 			sender.sendMessage("Wrong paraneter: " + teamsString);
 			return true;
 		}
-		MinigameTeam team1, team2;
+		DodgeballTeam team1, team2;
 		try {
-			team1 = MinigameTeam.valueOf(teams[0]);
-			team2 = MinigameTeam.valueOf(teams[1]);
+			team1 = DodgeballTeam.valueOf(teams[0]);
+			team2 = DodgeballTeam.valueOf(teams[1]);
 		} catch (IllegalArgumentException ex) {
 			sender.sendMessage("Incorrect color");
 			return true;
@@ -286,7 +286,7 @@ public class MinigameCommandsAndListener implements CommandExecutor, Listener {
 		ArenaCreator creator = new ArenaCreator(minPoint, maxPoint, blocks[0],
 				blocks[1], blocks[2], blocks[3], sectionHeight, plugin);
 		creator.runTaskAsynchronously(plugin);//avoid lag when command is executed
-		Minigame arena = new MinigameDodgeball(plugin, minPoint, maxPoint, name, team1, team2);
+		Minigame arena = new Dodgeball(plugin, minPoint, maxPoint, name, team1, team2);
 		selectedArena = arena;
 		mm.addMinigame(arena);
 		sender.sendMessage("Building dodgeball arena...");

@@ -18,7 +18,7 @@ class PlayerData {
 	private final Location loc;
 	private final Minigame m;
 
-	public PlayerData(MinigamePlayer mp) {
+	public PlayerData(DodgeballPlayer mp) {
 		this.p = mp.getPlayer();
 		this.inventory = p.getInventory().getContents();
 		this.health = p.getHealth();

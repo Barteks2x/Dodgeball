@@ -10,18 +10,18 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 public class MinigameManager implements Listener {
 
 	private final Map<String, Minigame> minigames;
-	private final Map<String, MinigamePlayer> players;
+	private final Map<String, DodgeballPlayer> players;
 	private final Map<String, PlayerData> playersData;
 	private final Plugin plug;
 
 	public MinigameManager(Plugin plug) {
 		this.playersData = new HashMap<String, PlayerData>(plug.getServer().getMaxPlayers());
-		this.players = new HashMap<String, MinigamePlayer>(plug.getServer().getMaxPlayers());
+		this.players = new HashMap<String, DodgeballPlayer>(plug.getServer().getMaxPlayers());
 		this.minigames = new HashMap<String, Minigame>(5);
 		this.plug = plug;
 	}
 
-	public boolean addPlayer(MinigamePlayer p) {
+	public boolean addPlayer(DodgeballPlayer p) {
 		//Minigame is added to manager in constructor
 		if (players.containsValue(p)) {
 			return false;
@@ -43,10 +43,12 @@ public class MinigameManager implements Listener {
 		return true;
 	}
 
-	public boolean removePlayer(MinigamePlayer p) {
+	public boolean removePlayer(DodgeballPlayer p) {
 		if (!players.containsValue(p)) {
 			return false;
 		}
+		Minigame m = players.get(p).getMinigame();
+		DodgeballTeam[] teamMapping = DodgeballTeam.values();
 		p.getPlayer().teleport(p.getMinigame().getSpawn());
 		playersData.get(p.getPlayer().getName()).restorePlayerData();
 		players.remove(p.getPlayer().getName());
@@ -58,9 +60,9 @@ public class MinigameManager implements Listener {
 		if (!minigames.containsValue(m)) {
 			return false;
 		}
-		Iterator<MinigamePlayer> it = players.values().iterator();
+		Iterator<DodgeballPlayer> it = players.values().iterator();
 		while (it.hasNext()) {
-			MinigamePlayer mp = it.next();
+			DodgeballPlayer mp = it.next();
 			if (mp.getMinigame() == m) {
 				removePlayer(mp);
 			}
@@ -69,7 +71,7 @@ public class MinigameManager implements Listener {
 		return true;
 	}
 
-	public MinigamePlayer getMinigamePlayer(String name) {
+	public DodgeballPlayer getMinigamePlayer(String name) {
 		return players.get(name);
 	}
 
@@ -92,8 +94,8 @@ public class MinigameManager implements Listener {
 		return players.containsKey(name);
 	}
 
-	public MinigamePlayer createPlayer(Player p, Minigame m) {
-		return new MinigamePlayer(p, m.autoSelectTeam(), m);
+	public DodgeballPlayer createPlayer(Player p, Minigame m) {
+		return new DodgeballPlayer(p, m.autoSelectTeam(), m);
 	}
 
 	@EventHandler

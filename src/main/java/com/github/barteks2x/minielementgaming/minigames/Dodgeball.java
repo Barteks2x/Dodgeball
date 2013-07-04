@@ -11,18 +11,18 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 
-public class MinigameDodgeball extends Minigame {
+public class Dodgeball extends Minigame {
 
 	private static final long serialVersionUID = 3612989452554623L;
 	private final CubeSerializable TEAM_1_AREA;
 	private final CubeSerializable TEAM_2_AREA;
-	private final MinigameTeam TEAM_1, TEAM_2;
+	private final DodgeballTeam TEAM_1, TEAM_2;
 	private final transient Random rand = new Random();
 	private final double TEAM_1_SPAWN_X, TEAM_2_SPAWN_X;
 
-	public MinigameDodgeball(Plugin plug, Location minPoint, Location maxPoint, String name,
-			MinigameTeam team1,
-			MinigameTeam team2) {
+	public Dodgeball(Plugin plug, Location minPoint, Location maxPoint, String name,
+			DodgeballTeam team1,
+			DodgeballTeam team2) {
 		super(plug, minPoint, maxPoint, MinigameEnum.DB, (byte)2, name);
 		World w = minPoint.getWorld();
 		double minX1 = minPoint.getX();
@@ -51,7 +51,7 @@ public class MinigameDodgeball extends Minigame {
 
 	@Override
 	public void handlePlayerMove(PlayerMoveEvent e) {
-		MinigamePlayer p = mm.getMinigamePlayer(e.getPlayer().getName());
+		DodgeballPlayer p = mm.getMinigamePlayer(e.getPlayer().getName());
 		CubeSerializable ca;
 		if (p.getTeam() == TEAM_1) {
 			ca = TEAM_1_AREA;
@@ -98,7 +98,7 @@ public class MinigameDodgeball extends Minigame {
 
 	@Override
 	public void onStart() {
-		MinigamePlayer parray[] = new MinigamePlayer[1];
+		DodgeballPlayer parray[] = new DodgeballPlayer[1];
 		parray = players.toArray(parray);
 		Player p = (parray[rand.nextInt(parray.length)]).getPlayer();
 		p.setItemInHand(new ItemStack(Material.SNOW_BALL, 1));
@@ -116,15 +116,15 @@ public class MinigameDodgeball extends Minigame {
 	}
 
 	@Override
-	public double getSpawnX(MinigamePlayer p) {
-		MinigameTeam t = p.getTeam();
+	public double getSpawnX(DodgeballPlayer p) {
+		DodgeballTeam t = p.getTeam();
 		return t == TEAM_1 ? TEAM_1_SPAWN_X : TEAM_2_SPAWN_X;
 	}
 
 	private void setPlayerAtRandomLocation(Player player) {
 		String pname = player.getName();
-		MinigamePlayer p = mm.getMinigamePlayer(pname);
-		MinigameTeam t = p.getTeam();
+		DodgeballPlayer p = mm.getMinigamePlayer(pname);
+		DodgeballTeam t = p.getTeam();
 		CubeSerializable a = t == TEAM_1 ? TEAM_1_AREA : TEAM_2_AREA;
 		LocationSerializable maxl = a.maxPoint;
 		LocationSerializable minl = a.minPoint;
@@ -136,17 +136,17 @@ public class MinigameDodgeball extends Minigame {
 	}
 
 	@Override
-	public MinigameTeam autoSelectTeam() {
+	public DodgeballTeam autoSelectTeam() {
 		if (teamPlayerCount[0] > teamPlayerCount[1]) {
-			teamPlayerCount[1]++;
-			return MinigameTeam.values()[teamIdMap[1]];
+			teamPlayerCount[1] += 1;
+			return DodgeballTeam.values()[teamIdMap[1]];
 		}
 		if (teamPlayerCount[0] < teamPlayerCount[1]) {
-			teamPlayerCount[0]++;
-			return MinigameTeam.values()[teamIdMap[0]];
+			teamPlayerCount[0] += 1;
+			return DodgeballTeam.values()[teamIdMap[0]];
 		}
 
-		return rand.nextBoolean() ? MinigameTeam.values()[teamIdMap[0]] :
-				MinigameTeam.values()[teamIdMap[1]];
+		return rand.nextBoolean() ? DodgeballTeam.values()[teamIdMap[0]] :
+				DodgeballTeam.values()[teamIdMap[1]];
 	}
 }

@@ -1,7 +1,7 @@
-package org.barteks2x.minielementgaming.minigames;
+package com.github.barteks2x.minielementgaming.minigames;
 
+import com.github.barteks2x.minielementgaming.*;
 import java.util.Random;
-import org.barteks2x.minielementgaming.*;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Snowball;
@@ -16,14 +16,14 @@ public class MinigameDodgeball extends Minigame {
 	private static final long serialVersionUID = 3612989452554623L;
 	private final CubeSerializable TEAM_1_AREA;
 	private final CubeSerializable TEAM_2_AREA;
-	public final String NAME;
 	private final MinigameTeam TEAM_1, TEAM_2;
 	private final transient Random rand = new Random();
 	private final double TEAM_1_SPAWN_X, TEAM_2_SPAWN_X;
 
-	public MinigameDodgeball(Location minPoint, Location maxPoint, String name, MinigameTeam team1,
+	public MinigameDodgeball(Plugin plug, Location minPoint, Location maxPoint, String name,
+			MinigameTeam team1,
 			MinigameTeam team2) {
-		super(minPoint, maxPoint, MinigameEnum.DB, (byte)2);
+		super(plug, minPoint, maxPoint, MinigameEnum.DB, (byte)2, name);
 		World w = minPoint.getWorld();
 		double minX1 = minPoint.getX();
 		double minY1 = minPoint.getY();
@@ -41,7 +41,6 @@ public class MinigameDodgeball extends Minigame {
 		double maxZ2 = maxZ1;
 		TEAM_2_AREA = new CubeSerializable(new LocationSerializable(w, minX2, minY2, minZ2),
 				new LocationSerializable(w, maxX2, maxY2, maxZ2));
-		this.NAME = name;
 		this.TEAM_1 = team1;
 		this.TEAM_2 = team2;
 		teamIdMap[0] = team1.ordinal();
@@ -52,7 +51,7 @@ public class MinigameDodgeball extends Minigame {
 
 	@Override
 	public void handlePlayerMove(PlayerMoveEvent e) {
-		MinigamePlayer p = players.get(e.getPlayer().getName());
+		MinigamePlayer p = mm.getMinigamePlayer(e.getPlayer().getName());
 		CubeSerializable ca;
 		if (p.getTeam() == TEAM_1) {
 			ca = TEAM_1_AREA;
@@ -63,7 +62,7 @@ public class MinigameDodgeball extends Minigame {
 		e.getPlayer().setFoodLevel(10);
 		e.getPlayer().setHealth(p.health >= 0 ? p.health : 0);
 		if (p.health <= 0) {
-			removePlayer(e.getPlayer());
+			mm.removePlayer(p);
 		}
 	}
 
@@ -78,41 +77,30 @@ public class MinigameDodgeball extends Minigame {
 		Player player = (Player)e.getEntity();
 		Player shooter = (Player)s.getShooter();
 		World w = s.getWorld();
-		if (players.get(player.getName()) == null || players.get(shooter.getName()) == null) {
+		if (!mm.hasPlayer(player.getName()) || !mm.hasPlayer(shooter.getName())) {
 			return;
 		}
 		if (player.getName().equals(shooter.getName())) {
 			e.setCancelled(true);
 			return;
 		}
-		if (players.get(player.getName()).getTeam() == players.get(shooter.getName()).getTeam()) {
+		if (mm.getMinigamePlayer(player.getName()).getTeam() == mm.getMinigamePlayer(shooter.
+				getName()).
+				getTeam()) {
 			e.setCancelled(true);
 			return;
 		}
 		Location itemPos = player.getLocation();
 		w.dropItemNaturally(itemPos.add(0, 1, 0), new ItemStack(Material.SNOW_BALL, 1));
 		setPlayerAtRandomLocation(player);
-		players.get(player.getName()).health -= 2;
-	}
-
-	@Override
-	public void addPlayer(Player p) {
-		super.addPlayer(p);
-		p.setHealth(6);
-		p.setFoodLevel(4);
-		p.setMaxHealth(20);
-		MinigamePlayer mp = players.get(p.getName());
-		MinigameTeam t = mp.getTeam();
-		p.getInventory().setHelmet(new ItemStack(Material.WOOL, 1, (short)t.ordinal()));
-		mp.health = 6;
-		mp.setSpawnX(t == TEAM_1 ? TEAM_1_SPAWN_X : TEAM_2_SPAWN_X);
+		mm.getMinigamePlayer(player.getName()).health -= 2;
 	}
 
 	@Override
 	public void onStart() {
-		Object parray[] = players.values().toArray();
-		Random rand = new Random();
-		Player p = ((MinigamePlayer)parray[rand.nextInt(parray.length)]).getPlayer();
+		MinigamePlayer parray[] = new MinigamePlayer[1];
+		parray = players.toArray(parray);
+		Player p = (parray[rand.nextInt(parray.length)]).getPlayer();
 		p.setItemInHand(new ItemStack(Material.SNOW_BALL, 1));
 	}
 
@@ -127,9 +115,15 @@ public class MinigameDodgeball extends Minigame {
 		}
 	}
 
+	@Override
+	public double getSpawnX(MinigamePlayer p) {
+		MinigameTeam t = p.getTeam();
+		return t == TEAM_1 ? TEAM_1_SPAWN_X : TEAM_2_SPAWN_X;
+	}
+
 	private void setPlayerAtRandomLocation(Player player) {
-		String name = player.getName();
-		MinigamePlayer p = players.get(name);
+		String pname = player.getName();
+		MinigamePlayer p = mm.getMinigamePlayer(pname);
 		MinigameTeam t = p.getTeam();
 		CubeSerializable a = t == TEAM_1 ? TEAM_1_AREA : TEAM_2_AREA;
 		LocationSerializable maxl = a.maxPoint;
@@ -142,7 +136,7 @@ public class MinigameDodgeball extends Minigame {
 	}
 
 	@Override
-	protected MinigameTeam autoSelectTeam(int[] teamIdMap) {
+	public MinigameTeam autoSelectTeam() {
 		if (teamPlayerCount[0] > teamPlayerCount[1]) {
 			teamPlayerCount[1]++;
 			return MinigameTeam.values()[teamIdMap[1]];

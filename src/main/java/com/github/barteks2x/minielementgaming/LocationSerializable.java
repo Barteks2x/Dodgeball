@@ -1,4 +1,4 @@
-package org.barteks2x.minielementgaming;
+package com.github.barteks2x.minielementgaming;
 
 import java.io.Serializable;
 import org.bukkit.Location;

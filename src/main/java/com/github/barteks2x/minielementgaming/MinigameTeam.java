@@ -1,4 +1,4 @@
-package org.barteks2x.minielementgaming;
+package com.github.barteks2x.minielementgaming;
 
 public enum MinigameTeam {
 

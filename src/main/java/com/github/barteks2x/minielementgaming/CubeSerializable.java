@@ -1,4 +1,4 @@
-package org.barteks2x.minielementgaming;
+package com.github.barteks2x.minielementgaming;
 
 import java.io.Serializable;
 import org.bukkit.Location;
@@ -59,6 +59,10 @@ public class CubeSerializable implements Serializable {
 		}
 		if (z > max.getZ()) {
 			newPos.setZ(max.getZ() - 1);
+			f = true;
+		}
+		if (newPos.getWorld() != min.getWorld()) {
+			newPos.setWorld(min.getWorld());
 			f = true;
 		}
 		if (f) {

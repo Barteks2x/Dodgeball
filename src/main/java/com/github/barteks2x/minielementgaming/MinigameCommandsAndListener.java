@@ -1,11 +1,10 @@
-package org.barteks2x.minielementgaming;
+package com.github.barteks2x.minielementgaming;
 
+import com.github.barteks2x.minielementgaming.minigames.Minigame;
+import com.github.barteks2x.minielementgaming.minigames.MinigameDodgeball;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.selections.Selection;
 import java.util.*;
-import java.util.logging.Level;
-import org.barteks2x.minielementgaming.minigames.Minigame;
-import org.barteks2x.minielementgaming.minigames.MinigameDodgeball;
 import org.bukkit.Location;
 import org.bukkit.command.*;
 import org.bukkit.entity.Player;
@@ -28,25 +27,19 @@ public class MinigameCommandsAndListener implements CommandExecutor, Listener {
 	private final String noselectionmsg = "Nothing selected. You must select arena!";
 	private final String toosmallarenamsg = "Too small arena! Arena must be at least " +
 			minArenaSizeXZ + "x" + minArenaSizeY + "x" + minArenaSizeXZ;
-	public final Map<String, Minigame> minigames = new HashMap<String, Minigame>();
-	public final Map<String, String> players = new HashMap<String, String>();
 	private Minigame selectedArena;
+	private final MinigameManager mm;
 
 	MinigameCommandsAndListener(Plugin plugin, WorldEditPlugin worldedit) {
 		this.plugin = plugin;
 		this.worldedit = worldedit;
+		this.mm = plugin.getMinigameManager();
 	}
 
 	@EventHandler
 	public void onPlayerMove(PlayerMoveEvent e) {
-
-		String a = players.get(e.getPlayer().getName());
-		if (a == null) {
-			return;
-		}
-		Minigame ab = minigames.get(a);
+		Minigame ab = mm.getPlayerMinigame(e.getPlayer().getName());
 		if (ab == null) {
-			plugin.getLogger().log(Level.WARNING, "Error! Couldn't find player in minigame arena!");
 			return;
 		}
 		ab.handlePlayerMove(e);
@@ -62,14 +55,9 @@ public class MinigameCommandsAndListener implements CommandExecutor, Listener {
 		if (e.getEntity() instanceof Player) {
 			if (e.getDamager() instanceof Snowball) {
 				Player p = (Player)e.getEntity();
-				if (players.containsKey(p.getName())) {
-					Minigame m = minigames.get(players.get(p.getName()));
-					if (m != null) {
-						m.handleEntityDamageByEntity(e);
-					} else {
-						plugin.getLogger().log(Level.WARNING,
-								"Error! Couldn't find player in minigame arena!");
-					}
+				Minigame m = mm.getPlayerMinigame(p.getName());
+				if (m != null) {
+					m.handleEntityDamageByEntity(e);
 				}
 			}
 		}
@@ -77,9 +65,9 @@ public class MinigameCommandsAndListener implements CommandExecutor, Listener {
 
 	@EventHandler
 	public void onProjectileHit(ProjectileHitEvent e) {
-		Object[] games = minigames.values().toArray();
-		for (Object g : games) {
-			((Minigame)g).handleProjectileHitEvent(e);
+		Iterator<Minigame> it = mm.getMinigames();
+		while (it.hasNext()) {
+			it.next().handleProjectileHitEvent(e);
 		}
 	}
 
@@ -107,18 +95,17 @@ public class MinigameCommandsAndListener implements CommandExecutor, Listener {
 		}
 		String n = args.next();
 		String p = ((Player)sender).getName();
-		if (players.containsKey(n)) {
+		if (mm.hasPlayer(p)) {
 			sender.sendMessage("You can't join two minigames! Use /leave to leave current minigame");
 			return true;
 		}
-		Minigame m = minigames.get(n);
+		Minigame m = mm.getMinigame(n);
 		if (m == null) {
 			sender.sendMessage(
 					"Minigame not exist! Are you sure name is correct?\"Mini\" and \"MiNi\" are different minigames!");
 			return true;
 		}
-		players.put(((Player)sender).getName(), n);
-		m.addPlayer((Player)sender);
+		mm.addPlayer(mm.createPlayer((Player)sender, m));
 		sender.sendMessage("Joined to minigame: " + n);
 		return true;
 	}
@@ -172,14 +159,7 @@ public class MinigameCommandsAndListener implements CommandExecutor, Listener {
 			sender.sendMessage("This command must be used by player");
 			return true;
 		}
-		String mg = players.get(((Player)sender).getName());
-		players.remove(((Player)sender).getName());
-		Minigame mgi = minigames.get(mg);
-		if (mgi != null) {
-			mgi.removePlayer((Player)sender);
-		} else {
-			sender.sendMessage("You arent in any active minigame!");
-		}
+		mm.removePlayer(mm.getMinigamePlayer(((Player)sender).getName()));
 		sender.sendMessage("Left ciurrent minigame.");
 		//TODO tp to spawn after minigame
 		return true;
@@ -210,7 +190,7 @@ public class MinigameCommandsAndListener implements CommandExecutor, Listener {
 			return true;
 		}
 		String name = args.next();
-		Minigame m = minigames.get(name);
+		Minigame m = mm.getMinigame(name);
 		m.onStart();
 		return false;
 	}
@@ -306,9 +286,9 @@ public class MinigameCommandsAndListener implements CommandExecutor, Listener {
 		ArenaCreator creator = new ArenaCreator(minPoint, maxPoint, blocks[0],
 				blocks[1], blocks[2], blocks[3], sectionHeight, plugin);
 		creator.runTaskAsynchronously(plugin);//avoid lag when command is executed
-		Minigame arena = new MinigameDodgeball(minPoint, maxPoint, name, team1, team2);
+		Minigame arena = new MinigameDodgeball(plugin, minPoint, maxPoint, name, team1, team2);
 		selectedArena = arena;
-		minigames.put(name, arena);
+		mm.addMinigame(arena);
 		sender.sendMessage("Building dodgeball arena...");
 		return true;
 	}
@@ -323,7 +303,7 @@ public class MinigameCommandsAndListener implements CommandExecutor, Listener {
 			return true;
 		}
 		String name = args.next();
-		minigames.get(name).setSpawn(((Player)sender).getLocation());
+		mm.getMinigame(name).setSpawn(((Player)sender).getLocation());
 		sender.sendMessage("Dodgeball spawn set: " + ((Player)sender).getLocation().toString());
 		return true;
 	}

@@ -1,8 +1,8 @@
-name: MiniElementGamingDodgeballPlugin
-version: 0.1-2-gc54bb70
+name: Dodgeball
+version: 0.1-3-gc02d54c
 description: Plugin for MiniElementGaming Minecraft server
 author: Barteks2x
-main: org.barteks2x.minielementgaming.Plugin
+main: com.github.barteks2x.minielementgaming.Plugin
 depend: [WorldEdit]
 loadbefore: [WorldEdit]
 commands:

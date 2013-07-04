@@ -2,7 +2,7 @@ name: ${name}
 version: ${describe}
 description: ${description}
 author: Barteks2x
-main: org.barteks2x.minielementgaming.Plugin
+main: ${groupId}.${artifactId}.Plugin
 depend: [WorldEdit]
 loadbefore: [WorldEdit]
 commands:

@@ -1,12 +1,5 @@
 package com.github.barteks2x.dodgeball;
 
-import com.github.barteks2x.dodgeball.DodgeballTeam;
-import com.github.barteks2x.dodgeball.LocationSerializable;
-import com.github.barteks2x.dodgeball.Plugin;
-import com.github.barteks2x.dodgeball.MinigameEnum;
-import com.github.barteks2x.dodgeball.MinigameManager;
-import com.github.barteks2x.dodgeball.CubeSerializable;
-import com.github.barteks2x.dodgeball.DodgeballPlayer;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,29 +12,23 @@ import org.bukkit.event.player.PlayerMoveEvent;
 public abstract class Minigame implements Serializable {
 
 	private static final long serialVersionUID = 342134832462L;
-	public transient final List<DodgeballPlayer> players = new ArrayList<DodgeballPlayer>();
+	public transient final List<DodgeballPlayer> playerList = new ArrayList<DodgeballPlayer>(10);
 	protected final CubeSerializable area;
 	protected final MinigameEnum minigame;
-	public final transient int[] teamPlayerCount;
-	public final int[] teamIdMap;
+	public final transient int[] teamPlayerCount = new int[DodgeballTeam.values().length];
 	protected LocationSerializable spawn;
 	protected final String name;
 	protected final Plugin plug;
 	protected MinigameManager mm;
+	public int players;
 
 	protected Minigame(Plugin plug, Location minPoint, Location maxPoint, MinigameEnum mg,
-			byte teams,
 			String name) {
-		if (teams <= 0) {
-			throw new IllegalArgumentException("Zreo or less teams!");
-		}
 		if (minPoint.equals(maxPoint)) {
 			throw new IllegalArgumentException("Arena size is zero!");
 		}
 		this.area = new CubeSerializable(minPoint, maxPoint);
 		this.minigame = mg;
-		teamPlayerCount = new int[teams];
-		teamIdMap = new int[teams];
 		this.name = name;
 		this.plug = plug;
 		this.mm = plug.getMinigameManager();
@@ -56,18 +43,7 @@ public abstract class Minigame implements Serializable {
 
 	public abstract void handleProjectileHitEvent(ProjectileHitEvent e);
 
-	public DodgeballTeam autoSelectTeam() {
-		int lowest = Integer.MAX_VALUE;
-		int team = 0;
-		for (int i = 0; i < teamPlayerCount.length; ++i) {
-			if (teamPlayerCount[i] < lowest) {
-				team = i;
-				lowest = teamPlayerCount[i];
-			}
-		}
-		teamPlayerCount[team] = lowest + 1;
-		return DodgeballTeam.values()[teamIdMap[team]];
-	}
+	public abstract DodgeballTeam autoSelectTeam();
 
 	public void setSpawn(Location loc) {
 		this.spawn = new LocationSerializable(loc);
@@ -87,4 +63,6 @@ public abstract class Minigame implements Serializable {
 	public abstract void onStart();
 
 	public abstract double getSpawnX(DodgeballPlayer p);
+
+	public abstract boolean hasTeam(String team);
 }

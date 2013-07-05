@@ -1,11 +1,5 @@
 package com.github.barteks2x.dodgeball;
 
-import com.github.barteks2x.dodgeball.DodgeballTeam;
-import com.github.barteks2x.dodgeball.LocationSerializable;
-import com.github.barteks2x.dodgeball.Plugin;
-import com.github.barteks2x.dodgeball.MinigameEnum;
-import com.github.barteks2x.dodgeball.CubeSerializable;
-import com.github.barteks2x.dodgeball.DodgeballPlayer;
 import java.util.Random;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
@@ -15,20 +9,21 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Vector;
 
 public class Dodgeball extends Minigame {
 
 	private static final long serialVersionUID = 3612989452554623L;
 	private final CubeSerializable TEAM_1_AREA;
 	private final CubeSerializable TEAM_2_AREA;
+	private final CubeSerializable SPECTATE_AREA;
 	private final DodgeballTeam TEAM_1, TEAM_2;
 	private final transient Random rand = new Random();
 	private final double TEAM_1_SPAWN_X, TEAM_2_SPAWN_X;
 
 	public Dodgeball(Plugin plug, Location minPoint, Location maxPoint, String name,
-			DodgeballTeam team1,
-			DodgeballTeam team2) {
-		super(plug, minPoint, maxPoint, MinigameEnum.DB, (byte)2, name);
+			DodgeballTeam team1, DodgeballTeam team2) {
+		super(plug, minPoint, maxPoint, MinigameEnum.DB, name);
 		World w = minPoint.getWorld();
 		double minX1 = minPoint.getX();
 		double minY1 = minPoint.getY();
@@ -48,26 +43,31 @@ public class Dodgeball extends Minigame {
 				new LocationSerializable(w, maxX2, maxY2, maxZ2));
 		this.TEAM_1 = team1;
 		this.TEAM_2 = team2;
-		teamIdMap[0] = team1.ordinal();
-		teamIdMap[1] = team2.ordinal();
 		TEAM_1_SPAWN_X = minX1 + 1;
 		TEAM_2_SPAWN_X = maxX2 - 1;
+		SPECTATE_AREA = new CubeSerializable(new LocationSerializable(minPoint).add(new Vector(0, 5,
+				0)).getLocation(), maxPoint);
 	}
 
 	@Override
 	public void handlePlayerMove(PlayerMoveEvent e) {
 		DodgeballPlayer p = mm.getMinigamePlayer(e.getPlayer().getName());
-		CubeSerializable ca;
-		if (p.getTeam() == TEAM_1) {
-			ca = TEAM_1_AREA;
-		} else {
-			ca = TEAM_2_AREA;
+		p.update(mm, getPlayerTeamArea(p), SPECTATE_AREA, e.getTo());
+	}
+
+	@Override
+	public boolean hasTeam(String team) {
+		if (TEAM_1.toString().equals(team) || TEAM_2.toString().equals(team)) {
+			return true;
 		}
-		ca.setPlayerInArea(e.getPlayer(), e.getTo());
-		e.getPlayer().setFoodLevel(10);
-		e.getPlayer().setHealth(p.health >= 0 ? p.health : 0);
-		if (p.health <= 0) {
-			mm.removePlayer(p);
+		return false;
+	}
+
+	private CubeSerializable getPlayerTeamArea(DodgeballPlayer p) {
+		if (p.getTeam() == TEAM_1) {
+			return TEAM_1_AREA;
+		} else {
+			return TEAM_2_AREA;
 		}
 	}
 
@@ -89,22 +89,24 @@ public class Dodgeball extends Minigame {
 			e.setCancelled(true);
 			return;
 		}
-		if (mm.getMinigamePlayer(player.getName()).getTeam() == mm.getMinigamePlayer(shooter.
-				getName()).
-				getTeam()) {
+		DodgeballPlayer mp = mm.getMinigamePlayer(player.getName());
+		DodgeballPlayer ms = mm.getMinigamePlayer(shooter.getName());
+		if (mp.getTeam() == ms.getTeam()) {
 			e.setCancelled(true);
 			return;
 		}
 		Location itemPos = player.getLocation();
 		w.dropItemNaturally(itemPos.add(0, 1, 0), new ItemStack(Material.SNOW_BALL, 1));
 		setPlayerAtRandomLocation(player);
-		mm.getMinigamePlayer(player.getName()).health -= 2;
+
+		mp.health -= 2;
+		mp.update(mm, getPlayerTeamArea(mp), SPECTATE_AREA, player.getLocation());
 	}
 
 	@Override
 	public void onStart() {
 		DodgeballPlayer parray[] = new DodgeballPlayer[1];
-		parray = players.toArray(parray);
+		parray = playerList.toArray(parray);
 		Player p = (parray[rand.nextInt(parray.length)]).getPlayer();
 		p.setItemInHand(new ItemStack(Material.SNOW_BALL, 1));
 	}
@@ -142,16 +144,16 @@ public class Dodgeball extends Minigame {
 
 	@Override
 	public DodgeballTeam autoSelectTeam() {
-		if (teamPlayerCount[0] > teamPlayerCount[1]) {
-			teamPlayerCount[1] += 1;
-			return DodgeballTeam.values()[teamIdMap[1]];
+		if (teamPlayerCount[TEAM_1.ordinal()] > teamPlayerCount[TEAM_2.ordinal()]) {
+			teamPlayerCount[TEAM_2.ordinal()] += 1;
+			return DodgeballTeam.values()[TEAM_1.ordinal()];
 		}
-		if (teamPlayerCount[0] < teamPlayerCount[1]) {
-			teamPlayerCount[0] += 1;
-			return DodgeballTeam.values()[teamIdMap[0]];
+		if (teamPlayerCount[TEAM_1.ordinal()] < teamPlayerCount[TEAM_2.ordinal()]) {
+			teamPlayerCount[TEAM_1.ordinal()] += 1;
+			return DodgeballTeam.values()[TEAM_1.ordinal()];
 		}
 
-		return rand.nextBoolean() ? DodgeballTeam.values()[teamIdMap[0]] :
-				DodgeballTeam.values()[teamIdMap[1]];
+		return rand.nextBoolean() ? DodgeballTeam.values()[TEAM_1.ordinal()] :
+				DodgeballTeam.values()[TEAM_2.ordinal()];
 	}
 }

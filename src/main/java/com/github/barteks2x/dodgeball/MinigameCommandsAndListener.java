@@ -3,7 +3,10 @@ package com.github.barteks2x.dodgeball;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.selections.Selection;
 import java.util.*;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.block.Block;
+import org.bukkit.block.Sign;
 import org.bukkit.command.*;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Snowball;
@@ -45,7 +48,35 @@ public class MinigameCommandsAndListener implements CommandExecutor, Listener {
 
 	@EventHandler
 	public void onPlayerInteract(PlayerInteractEvent e) {
-		//TODO onPlayerInteract
+		Block b = e.getClickedBlock();
+		if (b == null || !(b.getState() instanceof Sign)) {
+			return;
+		}
+		Sign s = (Sign)b.getState();
+		String lines[] = s.getLines();
+		if (!"[dodgeball]".equalsIgnoreCase(lines[0]) || lines[1] == null || lines[1].length() == 0) {
+			return;
+		}
+		if (!lines[1].startsWith("[") || !lines[1].endsWith("]")) {
+			return;
+		}
+		final String name = lines[1].replace("[", "").replace("]", "");
+		if (name.trim().length() == 0) {
+			return;
+		}
+		Player p = e.getPlayer();
+		join(p, new Iterator<String>() {
+			public boolean hasNext() {
+				return true;
+			}
+
+			public String next() {
+				return name;
+			}
+
+			public void remove() {
+			}
+		});
 	}
 
 	@EventHandler
@@ -83,6 +114,10 @@ public class MinigameCommandsAndListener implements CommandExecutor, Listener {
 	}
 
 	private boolean join(CommandSender sender, Iterator<String> args) {
+		if (!sender.hasPermission("db.join")) {
+			sender.sendMessage(ChatColor.RED + "You don't have permission to use this command!");
+			return true;
+		}
 		if (!(sender instanceof Player)) {
 			sender.sendMessage("This command must be executed by player");
 			return true;
@@ -103,7 +138,9 @@ public class MinigameCommandsAndListener implements CommandExecutor, Listener {
 					"Minigame not exist! Are you sure name is correct?\"Mini\" and \"MiNi\" are different minigames!");
 			return true;
 		}
-		mm.addPlayer(mm.createPlayer((Player)sender, m));
+		String team = sender.hasPermission("db.join.selectteam") ? args.hasNext() ? args.next().
+				toUpperCase() : null : null;
+		mm.addPlayer(mm.createPlayer((Player)sender, m, team));
 		sender.sendMessage("Joined to minigame: " + n);
 		return true;
 	}
@@ -119,16 +156,13 @@ public class MinigameCommandsAndListener implements CommandExecutor, Listener {
 		if ("automake".equalsIgnoreCase(par)) {
 			return autobuild(sender, args);
 		}
-		if ("create".equalsIgnoreCase(par) || "c".equalsIgnoreCase(par)) {
-			return create(sender, args);
-		}
 		if ("delete".equalsIgnoreCase(par) || "d".equalsIgnoreCase(par)) {
 			return delete(sender, args);
 		}
 		if ("start".equalsIgnoreCase(par) || "st".equalsIgnoreCase(par)) {
 			return start(sender, args);
 		}
-		if ("stop".equalsIgnoreCase(par) || "sp".equalsIgnoreCase(par)) {
+		if ("stop".equalsIgnoreCase(par)) {
 			return stop(sender, args);
 		}
 		if ("kickplayer".equalsIgnoreCase(par) || "kp".equalsIgnoreCase(par)) {
@@ -141,18 +175,25 @@ public class MinigameCommandsAndListener implements CommandExecutor, Listener {
 			return leave(sender);
 		}
 		if ("help".equalsIgnoreCase(par)) {
-			help(sender, args);
+			return help(sender, args);
 		}
 		if ("save".equalsIgnoreCase(par)) {
-			savestate(sender);
+			return savestate(sender);
 		}
-		if ("setspawn".equalsIgnoreCase(par)) {
+		if ("spawn".equalsIgnoreCase(par)) {
 			return setSpawn(sender, args);
+		}
+		if ("spectate".equalsIgnoreCase(par)) {
+			return spaecate(sender, args);
 		}
 		return false;
 	}
 
 	private boolean leave(CommandSender sender) {
+		if (!sender.hasPermission("db.leave")) {
+			sender.sendMessage(ChatColor.RED + "You don't have permission to use this command!");
+			return true;
+		}
 		if (!(sender instanceof Player)) {
 			sender.sendMessage("This command must be used by player");
 			return true;
@@ -172,25 +213,25 @@ public class MinigameCommandsAndListener implements CommandExecutor, Listener {
 		return false;
 	}
 
-	private boolean create(CommandSender sender, Iterator<String> args) {
-		//TODO Auto-generated method
-		return false;
-	}
-
 	private boolean delete(CommandSender sender, Iterator<String> args) {
 		//TODO Auto-generated method
 		return false;
 	}
 
 	private boolean start(CommandSender sender, Iterator<String> args) {
+		if (!sender.hasPermission("db.start")) {
+			sender.sendMessage(ChatColor.RED + "You don't have permission to use this command!");
+			return true;
+		}
+
 		if (!args.hasNext()) {
 			sender.sendMessage(noargsmsg);
-			return true;
+			return false;
 		}
 		String name = args.next();
 		Minigame m = mm.getMinigame(name);
 		m.onStart();
-		return false;
+		return true;
 	}
 
 	private boolean stop(CommandSender sender, Iterator<String> args) {
@@ -203,22 +244,16 @@ public class MinigameCommandsAndListener implements CommandExecutor, Listener {
 		return false;
 	}
 
-	private boolean select(CommandSender sender, Iterator<String> args) {
-		//TODO Auto-generated method
-		return false;
-	}
-
 	private boolean savestate(CommandSender sender) {
 		//TODO Auto-generated method
 		return false;
 	}
 
-	private boolean rebuild(CommandSender sender) {
-		//TODO Auto-generated method
-		return false;
-	}
-
 	private boolean autobuild(CommandSender sender, Iterator<String> args) {
+		if (!sender.hasPermission("db.automake")) {
+			sender.sendMessage(ChatColor.RED + "You don't have permission to use this command!");
+			return true;
+		}
 		if (!args.hasNext()) {
 			sender.sendMessage(noargsmsg);
 			return true;
@@ -231,8 +266,8 @@ public class MinigameCommandsAndListener implements CommandExecutor, Listener {
 		}
 		DodgeballTeam team1, team2;
 		try {
-			team1 = DodgeballTeam.valueOf(teams[0]);
-			team2 = DodgeballTeam.valueOf(teams[1]);
+			team1 = DodgeballTeam.valueOf(teams[0].toUpperCase());
+			team2 = DodgeballTeam.valueOf(teams[1].toUpperCase());
 		} catch (IllegalArgumentException ex) {
 			sender.sendMessage("Incorrect color");
 			return true;
@@ -292,6 +327,10 @@ public class MinigameCommandsAndListener implements CommandExecutor, Listener {
 	}
 
 	private boolean setSpawn(CommandSender sender, Iterator<String> args) {
+		if (!sender.hasPermission("db.setspawn")) {
+			sender.sendMessage(ChatColor.RED + "You don't have permission to use this command!");
+			return true;
+		}
 		if (!(sender instanceof Player)) {
 			sender.sendMessage("This command can be used only by player");
 			return true;
@@ -303,6 +342,45 @@ public class MinigameCommandsAndListener implements CommandExecutor, Listener {
 		String name = args.next();
 		mm.getMinigame(name).setSpawn(((Player)sender).getLocation());
 		sender.sendMessage("Dodgeball spawn set: " + ((Player)sender).getLocation().toString());
+		return true;
+	}
+
+	boolean registerDBCommand(String cmd, DBCommandHandler cmdHandler) {
+		//TODO registerCommand
+		return false;
+	}
+
+	private boolean spaecate(CommandSender sender,
+			Iterator<String> args) {
+		if (!sender.hasPermission("db.spectate")) {
+			sender.sendMessage(ChatColor.RED + "You don't have permission to use this command!");
+			return true;
+		}
+		if (!(sender instanceof Player)) {
+			sender.sendMessage("This command must be executed by player");
+			return true;
+		}
+		if (!args.hasNext()) {
+			sender.sendMessage("No minigame specified!");
+			return true;
+		}
+		String n = args.next();
+		String p = ((Player)sender).getName();
+		if (mm.hasPlayer(p)) {
+			sender.sendMessage(
+					"You can't spectate two minigames! Use /leave to leave current minigame");
+			return true;
+		}
+		Minigame m = mm.getMinigame(n);
+		if (m == null) {
+			sender.sendMessage(
+					"Minigame not exist! Are you sure name is correct? \"Mini\" and \"MiNi\" are different minigames!");
+			return true;
+		}
+		DodgeballPlayer mp = mm.createPlayer((Player)sender, m);
+		mm.addPlayer(mp);
+		mm.setPlayerSpactate(mp);
+		sender.sendMessage("Joined to minigame: " + n);
 		return true;
 	}
 }

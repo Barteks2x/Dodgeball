@@ -21,7 +21,6 @@ commands:
         /db kickplayer <minigame-name> <player>
         /db join <name> - join minigame
         /db leave - leave minigame
-    permission: db
   dbhelp:
     description: Minigame halp
     usage: /dbhelp [<subcommand1>] [<subcommand2>]
@@ -32,21 +31,21 @@ permissions:
       db.delete: true
       db.start: true
       db.stop: true
-      db.player.*: true
-      db.help.*: true
-  db.*:
+      db.player: true
+      db.help: true
+  db:
     description: Gives access to all dodgeball commands
     children:
       db.reload: true
       db.delete: true
       db.start: true
       db.stop: true
-      db.player.*: true
-      db.help.*: true
+      db.player: true
+      db.help: true
   db.reload:
     description: Gives access to reload dodgeball configuration
   db.automake:
-    description: Gives access to /db autobuild
+    description: Gives access to /db automake
   db.save:
     description: Gives access to /db savestate
   db.delete: 
@@ -55,7 +54,7 @@ permissions:
     description: Gives access to /db start
   db.stop: 
     description: Gives access to /db stop
-  db.player.*:
+  db.player:
     description: Gives access to all commands recommended for players
     children:
       db.join: true
@@ -65,7 +64,7 @@ permissions:
     description: Gives access to /db join (/join)
   db.leave:
     description: Gives access to /db leave (/leave)
-  db.help.*:
+  db.help:
     description: Minigame help commands
     children:
       db.help.admin: true

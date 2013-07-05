@@ -2,9 +2,7 @@ package com.github.barteks2x.dodgeball;
 
 import java.util.*;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerRespawnEvent;
 
 public class MinigameManager implements Listener {
 
@@ -30,7 +28,8 @@ public class MinigameManager implements Listener {
 		players.put(pl.getName(), p);
 		pl.getInventory().clear();
 		pl.getEquipment().clear();
-		p.getMinigame().players.add(p);
+		p.getMinigame().playerList.add(p);
+		p.getMinigame().players++;
 		return true;
 	}
 
@@ -50,9 +49,14 @@ public class MinigameManager implements Listener {
 		if (m.getSpawn() != null) {
 			p.getPlayer().teleport(p.getMinigame().getSpawn());
 		}
+		p.getMinigame().teamPlayerCount[p.getTeam().ordinal()]--;
 		playersData.get(p.getPlayer().getName()).restorePlayerData();
 		players.remove(p.getPlayer().getName());
-		p.getMinigame().players.remove(p);
+		p.getMinigame().playerList.remove(p);
+		p.getMinigame().players--;
+		if (p.getMinigame().teamPlayerCount[0] == 0 || p.getMinigame().teamPlayerCount[1] == 0) {
+			removeMinigame(p.getMinigame());
+		}
 		return true;
 	}
 
@@ -94,15 +98,22 @@ public class MinigameManager implements Listener {
 		return players.containsKey(name);
 	}
 
-	public DodgeballPlayer createPlayer(Player p, Minigame m) {
+	public DodgeballPlayer createPlayer(Player p, Minigame m, String team) {
+		if (m.hasTeam(team)) {
+			return new DodgeballPlayer(p, DodgeballTeam.valueOf(team), m);
+		}
 		return new DodgeballPlayer(p, m.autoSelectTeam(), m);
 	}
 
-	@EventHandler
-	public void onPlayerRespawn(PlayerRespawnEvent e) {
-		if (playersData.containsKey(e.getPlayer().getName())) {
-			playersData.get(e.getPlayer().getName()).restorePlayerData();
-			playersData.remove(e.getPlayer().getName());
+	public DodgeballPlayer createPlayer(Player p, Minigame m) {
+		return createPlayer(p, m, null);
+	}
+
+	public void setPlayerSpactate(DodgeballPlayer p) {
+		p.isSpectator = true;
+		p.getMinigame().players--;
+		if (p.getMinigame().teamPlayerCount[0] == 0 || p.getMinigame().teamPlayerCount[1] == 0) {
+			removeMinigame(p.getMinigame());
 		}
 	}
 }

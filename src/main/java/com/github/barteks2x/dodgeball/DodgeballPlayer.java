@@ -1,8 +1,12 @@
 package com.github.barteks2x.dodgeball;
 
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 public class DodgeballPlayer {
 
@@ -11,7 +15,8 @@ public class DodgeballPlayer {
 	public int health;
 	private double spawnX;
 	private final Minigame m;
-	private final int minigameteamIDmap;
+	public boolean isSpectator = false;
+	private boolean updated = false;
 
 	public DodgeballPlayer(Player player, DodgeballTeam team, Minigame mg) {
 
@@ -23,7 +28,6 @@ public class DodgeballPlayer {
 		player.getInventory().setHelmet(new ItemStack(Material.WOOL, 1, (short)team.ordinal()));
 		health = 6;
 		spawnX = mg.getSpawnX(this);
-		minigameteamIDmap = (DodgeballTeam.values()[mg.teamIdMap[0]] == team) ? 0 : 1;
 	}
 
 	public DodgeballTeam getTeam() {
@@ -48,5 +52,31 @@ public class DodgeballPlayer {
 
 	public void setSpawnX(double x) {
 		this.spawnX = x;
+	}
+
+	public void update(MinigameManager mm, CubeSerializable ta, CubeSerializable sa, Location newLoc) {
+		if ((isSpectator && !updated) || health <= 0) {
+			mm.setPlayerSpactate(this);
+			this.health = 20;
+			player.setAllowFlight(true);
+			player.setFlying(true);
+			player.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 1000000, 1));
+			player.getInventory().clear();
+			PlayerInventory pi = player.getInventory();
+			pi.setBoots(null);
+			pi.setChestplate(null);
+			pi.setHelmet(null);
+			pi.setLeggings(null);
+			updated = true;
+		}
+		player.setHealth(Math.max(0, health));
+		player.setFoodLevel(10);
+		if (isSpectator) {
+			player.setAllowFlight(true);
+			player.setFlying(true);
+			sa.setPlayerInArea(player, newLoc);
+		} else {
+			ta.setPlayerInArea(player, newLoc);
+		}
 	}
 }

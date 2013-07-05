@@ -3,11 +3,12 @@ package com.github.barteks2x.dodgeball;
 import java.io.Serializable;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.util.Vector;
 
 public class LocationSerializable implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	public final double x, y, z, yaw, pitch;
+	public double x, y, z, yaw, pitch;
 	public String world;
 	private transient World worldObj;
 
@@ -29,7 +30,21 @@ public class LocationSerializable implements Serializable {
 		this(l.getWorld(), l.getX(), l.getY(), l.getZ(), l.getYaw(), l.getPitch());
 	}
 
+	public LocationSerializable(LocationSerializable l) {
+		this(l.getLocation());
+	}
+
 	public Location getLocation() {
+		if (worldObj == null) {
+			//TODO get world object
+		}
 		return new Location(worldObj, x, y, z);
+	}
+
+	public LocationSerializable add(Vector v) {
+		this.x += v.getX();
+		this.y += v.getY();
+		this.z += v.getZ();
+		return this;
 	}
 }

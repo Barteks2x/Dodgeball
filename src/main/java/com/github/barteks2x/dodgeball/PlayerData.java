@@ -35,9 +35,9 @@ class PlayerData {
 		p.setExp(exp);
 		p.getEquipment().setArmorContents(armor);
 		p.setExhaustion(exhausion);
-		p.setFoodLevel(food);
+		p.setFoodLevel(20);
 		p.setMaxHealth(maxHealth);
-		p.setHealth(health);
+		p.setHealth(p.getMaxHealth());
 		if (m.getSpawn() != null) {
 			p.teleport(m.getSpawn());
 		} else {

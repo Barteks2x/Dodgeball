@@ -10,7 +10,7 @@ public class LocationSerializable implements Serializable {
 	private static final long serialVersionUID = 1L;
 	public double x, y, z, yaw, pitch;
 	public String world;
-	private transient World worldObj;
+	public transient World worldObj;
 
 	public LocationSerializable(World world, double x, double y, double z) {
 		this(world, x, y, z, 0, 0);
@@ -36,7 +36,10 @@ public class LocationSerializable implements Serializable {
 
 	public Location getLocation() {
 		if (worldObj == null) {
-			//TODO get world object
+			this.worldObj = Plugin.instance.getServer().getWorld(world);
+			if (worldObj == null) {
+				Plugin.instance.getLogger().warning("Couldn't find world: " + world);
+			}
 		}
 		return new Location(worldObj, x, y, z);
 	}

@@ -43,10 +43,12 @@ public class Dodgeball extends Minigame {
 				new LocationSerializable(w, maxX2, maxY2, maxZ2));
 		this.TEAM_1 = team1;
 		this.TEAM_2 = team2;
-		TEAM_1_SPAWN_X = minX1 + 1;
-		TEAM_2_SPAWN_X = maxX2 - 1;
+		TEAM_1_SPAWN_X = minX1 + 1 + 0.5D;//Block center = block position + 0.5
+		TEAM_2_SPAWN_X = maxX2 - 1 + 0.5D;
 		SPECTATE_AREA = new CubeSerializable(new LocationSerializable(minPoint).add(new Vector(0, 5,
 				0)).getLocation(), maxPoint);
+		this.maxPlayers = (int)((maxPoint.getX() - minPoint.getX()) * (maxPoint.getZ() - minPoint.
+				getZ()) / (8F + 1F / 3F));
 	}
 
 	@Override
@@ -63,6 +65,11 @@ public class Dodgeball extends Minigame {
 		return false;
 	}
 
+	@Override
+	public void onStop() {
+		isStarted = false;
+	}
+
 	private CubeSerializable getPlayerTeamArea(DodgeballPlayer p) {
 		if (p.getTeam() == TEAM_1) {
 			return TEAM_1_AREA;
@@ -73,11 +80,14 @@ public class Dodgeball extends Minigame {
 
 	@Override
 	public void handlePlayerInteract(PlayerInteractEvent e) {
-		//TODO Dodgeball player interact
 	}
 
 	@Override
 	public void handleEntityDamageByEntity(EntityDamageByEntityEvent e) {
+		if (!isStarted) {
+			e.setCancelled(true);
+			return;
+		}
 		Snowball s = (Snowball)e.getDamager();
 		Player player = (Player)e.getEntity();
 		Player shooter = (Player)s.getShooter();
@@ -105,10 +115,15 @@ public class Dodgeball extends Minigame {
 
 	@Override
 	public void onStart() {
+		isStarted = true;
 		DodgeballPlayer parray[] = new DodgeballPlayer[1];
 		parray = playerList.toArray(parray);
-		Player p = (parray[rand.nextInt(parray.length)]).getPlayer();
-		p.setItemInHand(new ItemStack(Material.SNOW_BALL, 1));
+		Player pl = (parray[rand.nextInt(parray.length)]).getPlayer();
+		pl.setItemInHand(new ItemStack(Material.SNOW_BALL, 3));
+		for (DodgeballPlayer p : parray) {
+			setPlayerAtRandomLocation(pl);
+			p.getPlayer().sendMessage(ChatColor.MAGIC + "Minigame Started!");
+		}
 	}
 
 	@Override
@@ -128,7 +143,7 @@ public class Dodgeball extends Minigame {
 		return t == TEAM_1 ? TEAM_1_SPAWN_X : TEAM_2_SPAWN_X;
 	}
 
-	private void setPlayerAtRandomLocation(Player player) {
+	protected void setPlayerAtRandomLocation(Player player) {
 		String pname = player.getName();
 		DodgeballPlayer p = mm.getMinigamePlayer(pname);
 		DodgeballTeam t = p.getTeam();

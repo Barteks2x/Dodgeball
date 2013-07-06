@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -21,6 +22,9 @@ public abstract class Minigame implements Serializable {
 	protected final Plugin plug;
 	protected MinigameManager mm;
 	public int players;
+	public boolean isStarted = false;
+	public int maxPlayers;
+	public int votes;
 
 	protected Minigame(Plugin plug, Location minPoint, Location maxPoint, MinigameEnum mg,
 			String name) {
@@ -62,7 +66,11 @@ public abstract class Minigame implements Serializable {
 
 	public abstract void onStart();
 
+	public abstract void onStop();
+
 	public abstract double getSpawnX(DodgeballPlayer p);
 
 	public abstract boolean hasTeam(String team);
+
+	protected abstract void setPlayerAtRandomLocation(Player player);
 }

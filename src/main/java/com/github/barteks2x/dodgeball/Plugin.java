@@ -11,6 +11,7 @@ public class Plugin extends JavaPlugin {
 
 	private WorldEditPlugin worldedit;
 	private MinigameManager mm;
+	public static Plugin instance;
 
 	@Override
 	public void onEnable() {
@@ -21,6 +22,7 @@ public class Plugin extends JavaPlugin {
 		getServer().getPluginManager().registerEvents(l, this);
 		getCommand("db").setExecutor(exec);
 		getServer().getPluginManager().registerEvents(mm, this);
+		instance = this;
 	}
 
 	@Override

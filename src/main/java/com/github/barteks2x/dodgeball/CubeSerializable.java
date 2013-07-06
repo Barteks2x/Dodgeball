@@ -38,27 +38,27 @@ public class CubeSerializable implements Serializable {
 		Location min = minPoint.getLocation();
 		Location max = maxPoint.getLocation();
 		if (x < min.getX()) {
-			newPos.setX(min.getX() + 1);
+			newPos.setX(min.getX() + 1 + 0.5F);
 			f = true;
 		}
 		if (x > max.getX()) {
-			newPos.setX(max.getX() - 1);
+			newPos.setX(max.getX() - 1 + 0.5F);
 			f = true;
 		}
 		if (y < min.getY()) {
-			newPos.setY(min.getY() + 1);
+			newPos.setY(min.getY() + 1 + 0.5F);
 			f = true;
 		}
 		if (y > max.getY()) {
-			newPos.setY(max.getY() - 1);
+			newPos.setY(max.getY() - 1 + 0.5F);
 			f = true;
 		}
 		if (z < min.getZ()) {
-			newPos.setZ(min.getZ() + 1);
+			newPos.setZ(min.getZ() + 1 + 0.5F);
 			f = true;
 		}
 		if (z > max.getZ()) {
-			newPos.setZ(max.getZ() - 1);
+			newPos.setZ(max.getZ() - 1 + 0.5F);
 			f = true;
 		}
 		if (newPos.getWorld() != min.getWorld()) {

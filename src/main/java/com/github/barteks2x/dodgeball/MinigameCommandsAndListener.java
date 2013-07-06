@@ -1,6 +1,5 @@
 package com.github.barteks2x.dodgeball;
 
-import com.github.barteks2x.dodgeball.command.DBCommand;
 import com.github.barteks2x.dodgeball.command.*;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import java.lang.reflect.InvocationTargetException;
@@ -11,12 +10,12 @@ import java.util.logging.Logger;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.bukkit.command.*;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Snowball;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -47,6 +46,7 @@ public class MinigameCommandsAndListener implements CommandExecutor, Listener {
 		registerCommand(new Join(mm));
 		registerCommand(new Help(mm));
 		registerCommand(new Stop(mm));
+		registerCommand(new Vote(mm));
 	}
 
 	public void registerCommand(Object obj) {
@@ -110,7 +110,7 @@ public class MinigameCommandsAndListener implements CommandExecutor, Listener {
 		return false;
 	}
 
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	public void onPlayerMove(PlayerMoveEvent e) {
 		Minigame ab = mm.getPlayerMinigame(e.getPlayer().getName());
 		if (ab == null) {
@@ -119,7 +119,7 @@ public class MinigameCommandsAndListener implements CommandExecutor, Listener {
 		ab.handlePlayerMove(e);
 	}
 
-	@EventHandler
+	@EventHandler()
 	public void onPlayerInteract(PlayerInteractEvent e) {
 		Block b = e.getClickedBlock();
 		if (b == null || !(b.getState() instanceof Sign)) {
@@ -140,30 +140,44 @@ public class MinigameCommandsAndListener implements CommandExecutor, Listener {
 		Player p = e.getPlayer();
 		executeCommand("join", p, new Iterator<String>() {
 			public boolean hasNext() {
-				return true;
+				return true;//Always has next
 			}
 
 			public String next() {
-				return name;
+				return name;//Always return the same String
 			}
 
-			public void remove() {
+			public void remove() {//Do not remove
 			}
 		});
 	}
 
-	@EventHandler
+	@EventHandler()
 	public void onEntityDamageEntity(EntityDamageByEntityEvent e) {
 		EntityDamageByEntityHandler eh = new EntityDamageByEntityHandler(e);
 		eh.runTask(plugin);
 	}
 
-	@EventHandler
+	@EventHandler()
 	public void onProjectileHit(ProjectileHitEvent e) {
 		Iterator<Minigame> it = mm.getMinigames();
 		while (it.hasNext()) {
 			it.next().handleProjectileHitEvent(e);
 		}
+	}
+
+	@EventHandler(ignoreCancelled = true)
+	public void onInventoryClick(InventoryClickEvent e) {
+		HumanEntity human = e.getWhoClicked();
+		if (!(human instanceof Player)) {
+			return;
+		}
+		Player p = (Player)human;
+		Minigame m;
+		if ((m = mm.getPlayerMinigame(p.getName())) == null) {
+			return;
+		}
+		m.handlePlayerInventoryClick(e);
 	}
 
 	private class EntityDamageByEntityHandler extends BukkitRunnable {

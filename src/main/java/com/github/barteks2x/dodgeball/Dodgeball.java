@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Snowball;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
@@ -68,6 +69,13 @@ public class Dodgeball extends Minigame {
 	@Override
 	public void onStop() {
 		isStarted = false;
+	}
+
+	@Override
+	public void handlePlayerInventoryClick(InventoryClickEvent e) {
+		if (e.getCurrentItem().getType() == Material.WOOL) {
+			e.setCancelled(true);
+		}
 	}
 
 	private CubeSerializable getPlayerTeamArea(DodgeballPlayer p) {

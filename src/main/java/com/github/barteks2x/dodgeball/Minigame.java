@@ -7,6 +7,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 
@@ -71,6 +72,8 @@ public abstract class Minigame implements Serializable {
 	public abstract double getSpawnX(DodgeballPlayer p);
 
 	public abstract boolean hasTeam(String team);
+
+	public abstract void handlePlayerInventoryClick(InventoryClickEvent e);
 
 	protected abstract void setPlayerAtRandomLocation(Player player);
 }

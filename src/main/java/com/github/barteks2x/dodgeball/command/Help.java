@@ -15,7 +15,7 @@ public class Help {
 	@DBCommand
 	public boolean help(CommandSender sender, Iterator<String> args) {
 		//TODO help
-		return true;
+		return false;//Will send defalut help message to player
 	}
 
 	@DBCommand

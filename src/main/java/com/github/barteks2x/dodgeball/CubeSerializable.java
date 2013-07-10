@@ -78,7 +78,7 @@ public class CubeSerializable implements Serializable {
 		int ZC = (int)minPoint.z >> 4;
 		int maxZC = (int)maxPoint.z >> 4;
 
-		World w = minPoint.worldObj;
+		World w = minPoint.getWorldObj();
 		for (; XC <= maxXC; ++XC) {
 			for (; ZC <= maxZC; ++ZC) {
 				Chunk chunk = w.getChunkAt(XC, ZC);

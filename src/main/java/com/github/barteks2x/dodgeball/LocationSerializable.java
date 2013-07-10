@@ -1,6 +1,7 @@
 package com.github.barteks2x.dodgeball;
 
 import java.io.Serializable;
+import java.util.logging.Level;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.util.Vector;
@@ -10,7 +11,7 @@ public class LocationSerializable implements Serializable {
 	private static final long serialVersionUID = 1L;
 	public double x, y, z, yaw, pitch;
 	public String world;
-	public transient World worldObj;
+	private transient World worldObj;
 
 	public LocationSerializable(World world, double x, double y, double z) {
 		this(world, x, y, z, 0, 0);
@@ -35,13 +36,7 @@ public class LocationSerializable implements Serializable {
 	}
 
 	public Location getLocation() {
-		if (worldObj == null) {
-			this.worldObj = Plugin.plug.getServer().getWorld(world);
-			if (worldObj == null) {
-				Plugin.plug.getLogger().warning("Couldn't find world: " + world);
-			}
-		}
-		return new Location(worldObj, x, y, z);
+		return new Location(getWorldObj(), x, y, z);
 	}
 
 	public LocationSerializable add(Vector v) {
@@ -49,5 +44,15 @@ public class LocationSerializable implements Serializable {
 		this.y += v.getY();
 		this.z += v.getZ();
 		return this;
+	}
+
+	public World getWorldObj() {
+		if (worldObj == null) {
+			this.worldObj = Plugin.plug.getServer().getWorld(world);
+			if (worldObj == null) {
+				Plugin.plug.getLogger().log(Level.WARNING, "Couldn''t find world: {0}", world);
+			}
+		}
+		return worldObj;
 	}
 }

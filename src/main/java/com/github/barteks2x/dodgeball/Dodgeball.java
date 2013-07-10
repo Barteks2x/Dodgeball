@@ -19,7 +19,7 @@ public class Dodgeball implements Serializable {
 	public transient ArrayList<DodgeballPlayer> playerList =
 			new ArrayList<DodgeballPlayer>(10);
 	protected final CubeSerializable area;
-	private final int[] teamPlayerCount = new int[DodgeballTeam.values().length];
+	private int[] teamPlayerCount = new int[DodgeballTeam.values().length];
 	protected LocationSerializable spawn;
 	protected final String name;
 	protected DodgeballManager mm;
@@ -72,6 +72,7 @@ public class Dodgeball implements Serializable {
 
 	public void init() {
 		playerList = new ArrayList<DodgeballPlayer>(maxPlayers + 5);
+		teamPlayerCount = new int[DodgeballTeam.values().length];
 	}
 
 	public void handlePlayerMove(PlayerMoveEvent e) {

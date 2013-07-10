@@ -175,7 +175,7 @@ public class DodgeballManager implements Listener, Serializable {
 			public void run() {
 				stopMinigame_exec(m);
 			}
-		}.runTaskLater(plug, 30 * 20);
+		}.runTaskLater(plug, 5 * 20);
 	}
 
 	public void startMinigameDelayed(final Dodgeball m) {
@@ -249,7 +249,7 @@ public class DodgeballManager implements Listener, Serializable {
 			int randX = rand.nextInt(maxX - minX - 2) + minX + 1;
 			int randY = (int)(rand.nextInt(10) + c.maxPoint.y);
 			int randZ = rand.nextInt(maxZ - minZ - 2) + minZ + 1;
-			World w = c.minPoint.worldObj;
+			World w = c.minPoint.getWorldObj();
 			try {
 				FireworkEffectPlayer.playFirework(w, new Location(w, randX, randY, randZ),
 						getRandomFireworkEffect(), rand.nextInt(3) + 1);

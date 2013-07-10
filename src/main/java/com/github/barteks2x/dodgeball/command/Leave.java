@@ -26,6 +26,9 @@ public class Leave {
 			sender.sendMessage("This command must be used by player");
 			return true;
 		}
+		if (!mm.hasPlayer(((Player)sender).getName())) {
+			return true;
+		}
 		mm.removePlayer(mm.getMinigamePlayer(((Player)sender).getName()));
 		sender.sendMessage(GREEN + "Left ciurrent minigame.");
 		return true;

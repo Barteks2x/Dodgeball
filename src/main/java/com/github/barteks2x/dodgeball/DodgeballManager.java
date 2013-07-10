@@ -129,12 +129,6 @@ public class DodgeballManager implements Listener, Serializable {
 		return createPlayer(p, m, null);
 	}
 
-	public void setPlayerSpactate(DodgeballPlayer p) {
-		p.isSpectator = true;
-		p.getMinigame().players--;
-		final Dodgeball m = p.getMinigame();
-	}
-
 	public void stopMinigame(String name) {
 		if (minigames.containsKey(name)) {
 			stopMinigame(minigames.get(name));
@@ -148,35 +142,39 @@ public class DodgeballManager implements Listener, Serializable {
 		}
 	}
 
-	private void stopMinigame(final Dodgeball m) {
+	void stopMinigame(final Dodgeball m) {
 		if (!m.isStarted) {
 			return;
 		}
-		DodgeballTeam winnerTeam = m.getWinnerTeam();
-		DodgeballPlayer[] pList = new DodgeballPlayer[1];
-		pList = m.playerList.toArray(pList);
+		final DodgeballTeam winnerTeam = m.getWinnerTeam();
+		final DodgeballPlayer[] pList = new DodgeballPlayer[m.playerList.toArray().length + 1];
+		m.playerList.toArray(pList);
 		for (DodgeballPlayer p : pList) {
-			if (winnerTeam != null) {
-				p.getPlayer().sendMessage(ChatColor.GOLD + "Winner team: " + winnerTeam.
-						toString().toLowerCase());
-			}
-			removePlayer(p);
+			m.onPlayerDeath(p);//set player spectator
+		}
+		int fireworks = 10;
+		for (int i = 0; i < fireworks; ++i) {
+			new FireworkEffectTask(rand.nextLong(), m.area).runTaskLater(plug,
+					rand.nextInt(8 * 20) + 2 * 20);
 		}
 		new BukkitRunnable() {
 			private void stopMinigame_exec(Dodgeball m) {
 				m.onStop();
 
-				int fireworks = 10;
-				for (int i = 0; i < fireworks; ++i) {
-					new FireworkEffectTask(rand.nextLong(), m.area).runTaskLater(plug, rand.nextInt(
-							100) + 101);
+				for (DodgeballPlayer p : pList) {
+					if (winnerTeam != null) {
+						p.getPlayer().sendMessage(ChatColor.GOLD + "Winner team: " + winnerTeam.
+								getColor() + winnerTeam.
+								toString().toLowerCase());
+					}
+					removePlayer(p);
 				}
 			}
 
 			public void run() {
 				stopMinigame_exec(m);
 			}
-		}.runTaskLater(plug, 5 * 20);
+		}.runTaskLater(plug, 10 * 20);
 	}
 
 	public void startMinigameDelayed(final Dodgeball m) {

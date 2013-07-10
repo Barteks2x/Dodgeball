@@ -113,11 +113,11 @@ public class Dodgeball implements Serializable {
 		}
 		Location itemPos = player.getLocation();
 		w.dropItemNaturally(itemPos.add(0, 1, 0), new ItemStack(Material.SNOW_BALL, 1));
+		s.remove();
 		setPlayerAtRandomLocation(player);
 
 		mp.health -= 2;
 		mp.update(mm, getPlayerTeamArea(mp), SPECTATE_AREA, player.getLocation());
-		this.stopIfDone();
 	}
 
 	public void handleProjectileHitEvent(ProjectileHitEvent e) {
@@ -162,6 +162,7 @@ public class Dodgeball implements Serializable {
 
 	public void onPlayerLeave(DodgeballPlayer p) {
 		players--;
+		teamPlayerCount[p.getTeam().ordinal()]--;
 		playerList.remove(p);
 		stopIfDone();
 	}
@@ -210,7 +211,7 @@ public class Dodgeball implements Serializable {
 				DodgeballTeam.values()[TEAM_2.ordinal()];
 	}
 
-	public boolean isDone() {
+	private boolean isDone() {
 		return players > 0 &&
 				(teamPlayerCount[TEAM_1.ordinal()] <= 0 || teamPlayerCount[TEAM_2.ordinal()] <= 0);
 	}
@@ -242,7 +243,7 @@ public class Dodgeball implements Serializable {
 
 	private void stopIfDone() {
 		if (isDone()) {
-			mm.stopMinigame(name);
+			mm.stopMinigame(this);
 		}
 	}
 }

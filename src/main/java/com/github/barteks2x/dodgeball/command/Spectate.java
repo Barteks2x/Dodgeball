@@ -44,7 +44,7 @@ public class Spectate {
 		}
 		DodgeballPlayer mp = mm.createPlayer((Player)sender, m);
 		mm.addPlayer(mp);
-		mm.setPlayerSpactate(mp);
+		m.onPlayerDeath(mp);//Spectate
 		sender.sendMessage(GREEN + "Joined to minigame: " + n);
 		return true;
 	}

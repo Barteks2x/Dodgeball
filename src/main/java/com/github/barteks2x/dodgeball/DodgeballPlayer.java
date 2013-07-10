@@ -61,7 +61,6 @@ public class DodgeballPlayer {
 	public void update(DodgeballManager mm, CubeSerializable ta, CubeSerializable sa,
 			Location newLoc) {
 		if (health <= 0) {
-			mm.setPlayerSpactate(this);
 			this.health = 20;
 			player.setAllowFlight(true);
 			player.setFlying(true);

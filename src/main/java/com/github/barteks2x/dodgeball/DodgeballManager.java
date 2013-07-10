@@ -26,6 +26,10 @@ public class DodgeballManager implements Listener, Serializable {
 	public DodgeballManager init(Plugin plug) {
 		this.playersData = new HashMap<String, PlayerData>(plug.getServer().getMaxPlayers() + 5);
 		this.players = new HashMap<String, DodgeballPlayer>(plug.getServer().getMaxPlayers() + 5);
+		Collection<Dodgeball> c = minigames.values();
+		for (Dodgeball db : c) {
+			db.init();
+		}
 		return this;
 	}
 

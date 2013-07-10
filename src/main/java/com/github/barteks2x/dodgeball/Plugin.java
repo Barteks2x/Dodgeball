@@ -97,7 +97,6 @@ public class Plugin extends JavaPlugin {
 					oos.close();
 				}
 			} catch (IOException ex) {
-				Logger.getLogger(Plugin.class.getName()).log(Level.SEVERE, null, ex);
 			}
 		}
 	}

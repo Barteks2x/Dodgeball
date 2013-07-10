@@ -16,7 +16,7 @@ import org.bukkit.util.Vector;
 public class Dodgeball implements Serializable {
 
 	private static final long serialVersionUID = 342134832462L;
-	public transient final ArrayList<DodgeballPlayer> playerList =
+	public transient ArrayList<DodgeballPlayer> playerList =
 			new ArrayList<DodgeballPlayer>(10);
 	protected final CubeSerializable area;
 	private final int[] teamPlayerCount = new int[DodgeballTeam.values().length];
@@ -68,7 +68,10 @@ public class Dodgeball implements Serializable {
 				0)).getLocation(), maxPoint);
 		this.maxPlayers = (int)((maxPoint.getX() - minPoint.getX()) * (maxPoint.getZ() - minPoint.
 				getZ()) / (8F + 1F / 3F));
+	}
 
+	public void init() {
+		playerList = new ArrayList<DodgeballPlayer>(maxPlayers + 5);
 	}
 
 	public void handlePlayerMove(PlayerMoveEvent e) {
@@ -77,6 +80,9 @@ public class Dodgeball implements Serializable {
 	}
 
 	public void handlePlayerInventoryClick(InventoryClickEvent e) {
+		if (e.getCurrentItem() == null) {
+			return;
+		}
 		if (e.getCurrentItem().getType() == Material.WOOL) {
 			e.setCancelled(true);
 		}

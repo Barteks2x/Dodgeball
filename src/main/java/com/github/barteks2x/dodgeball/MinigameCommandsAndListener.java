@@ -6,7 +6,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.bukkit.command.*;
@@ -85,26 +84,19 @@ public class MinigameCommandsAndListener implements CommandExecutor, Listener {
 			return (Boolean)commands.get(cmd).getClass().getMethod(cmd, CommandSender.class,
 					Iterator.class).invoke(commands.get(cmd), sender, args);
 		} catch (SecurityException ex) {
-			Logger.getLogger(MinigameCommandsAndListener.class.getName()).
-					log(Level.SEVERE, null, ex);
+			plug.getLogger().log(Level.SEVERE, null, ex);
 		} catch (IllegalAccessException ex) {
-			Logger.getLogger(MinigameCommandsAndListener.class.getName()).
-					log(Level.SEVERE, null, ex);
+			plug.getLogger().log(Level.SEVERE, null, ex);
 		} catch (IllegalArgumentException ex) {
-			Logger.getLogger(MinigameCommandsAndListener.class.getName()).
-					log(Level.SEVERE, null, ex);
+			plug.getLogger().log(Level.SEVERE, null, ex);
 		} catch (InvocationTargetException ex) {
-			Logger.getLogger(MinigameCommandsAndListener.class.getName()).
-					log(Level.SEVERE, null, ex);
+			plug.getLogger().log(Level.SEVERE, null, ex);
 		} catch (NullPointerException ex) {
-			Logger.getLogger(MinigameCommandsAndListener.class.getName()).
-					log(Level.SEVERE, null, ex);
+			plug.getLogger().log(Level.SEVERE, null, ex);
 		} catch (ClassCastException ex) {
-			Logger.getLogger(MinigameCommandsAndListener.class.getName()).
-					log(Level.SEVERE, null, ex);
+			plug.getLogger().log(Level.SEVERE, null, ex);
 		} catch (NoSuchMethodException ex) {
-			Logger.getLogger(MinigameCommandsAndListener.class.getName()).
-					log(Level.SEVERE, null, ex);
+			plug.getLogger().log(Level.SEVERE, null, ex);
 		}
 		return false;
 	}

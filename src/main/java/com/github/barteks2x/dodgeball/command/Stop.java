@@ -1,6 +1,6 @@
 package com.github.barteks2x.dodgeball.command;
 
-import com.github.barteks2x.dodgeball.*;
+import com.github.barteks2x.dodgeball.DodgeballManager;
 import java.util.Iterator;
 import org.bukkit.command.CommandSender;
 
@@ -24,14 +24,7 @@ public class Stop {
 			sender.sendMessage("Not enough parameters!");
 			return true;
 		}
-		Dodgeball db = mm.getMinigame(args.next());
-		db.isStarted = false;
-		DodgeballPlayer mpl[] = new DodgeballPlayer[10];
-		mpl = db.playerList.toArray(mpl);
-		for (DodgeballPlayer dbp : mpl) {
-			mm.removePlayer(dbp);
-			dbp.getPlayer().sendMessage("Minigame stopped.");
-		}
+		mm.stopMinigame(args.next());
 		return true;
 	}
 }

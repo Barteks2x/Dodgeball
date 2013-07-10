@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.github.barteks2x</groupId>
 	<artifactId>dodgeball</artifactId>
-	<version>0.3</version>
+	<version>0.4</version>
 	<name>Dodgeball</name>
 	<description>Plugin for MiniElementGaming Minecraft server</description>
 	<properties>

@@ -24,7 +24,7 @@ public class Dodgeball implements Serializable {
 	protected final String name;
 	protected DodgeballManager mm;
 	public int players;
-	public boolean isStarted = false;
+	public transient boolean isStarted = false;
 	public int maxPlayers;
 	public int votes;
 	private final CubeSerializable TEAM_1_AREA;
@@ -73,6 +73,7 @@ public class Dodgeball implements Serializable {
 	public void init() {
 		playerList = new ArrayList<DodgeballPlayer>(maxPlayers + 5);
 		teamPlayerCount = new int[DodgeballTeam.values().length];
+		isStarted = false;
 	}
 
 	public void handlePlayerMove(PlayerMoveEvent e) {

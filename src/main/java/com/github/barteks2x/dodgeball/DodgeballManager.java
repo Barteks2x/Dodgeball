@@ -150,6 +150,9 @@ public class DodgeballManager implements Listener, Serializable {
 		final DodgeballPlayer[] pList = new DodgeballPlayer[m.playerList.toArray().length + 1];
 		m.playerList.toArray(pList);
 		for (DodgeballPlayer p : pList) {
+			if (p == null) {
+				continue;
+			}
 			m.onPlayerDeath(p);//set player spectator
 		}
 		int fireworks = 10;

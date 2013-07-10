@@ -11,7 +11,8 @@ import org.bukkit.potion.PotionEffectType;
 public class DodgeballPlayer {
 
 	private final DodgeballTeam team;
-	private final Player player;
+	private final String pName;
+	private transient Player player;
 	public int health;
 	private double spawnX;
 	private final Dodgeball m;
@@ -19,7 +20,7 @@ public class DodgeballPlayer {
 	private boolean updated = false;
 
 	public DodgeballPlayer(Player player, DodgeballTeam team, Dodgeball mg) {
-
+		this.pName = player.getName();
 		this.player = player;
 		this.team = team;
 		this.m = mg;
@@ -35,7 +36,11 @@ public class DodgeballPlayer {
 	}
 
 	public Player getPlayer() {
+		if (player == null) {
+			player = Plugin.plug.getServer().getPlayer(pName);
+		}
 		return player;
+
 	}
 
 	public Dodgeball getMinigame() {
@@ -54,7 +59,8 @@ public class DodgeballPlayer {
 		this.spawnX = x;
 	}
 
-	public void update(DodgeballManager mm, CubeSerializable ta, CubeSerializable sa, Location newLoc) {
+	public void update(DodgeballManager mm, CubeSerializable ta, CubeSerializable sa,
+			Location newLoc) {
 		if ((isSpectator && !updated) || health <= 0) {
 			mm.setPlayerSpactate(this);
 			this.health = 20;

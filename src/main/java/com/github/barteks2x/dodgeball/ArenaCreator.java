@@ -11,7 +11,6 @@ public class ArenaCreator extends BukkitRunnable {
 	private BlockData floor, wall1, wall2, line;
 	private int sectionHeight;
 	private List<BlockData> blockUpdates;
-	private final Plugin plugin;
 	private final World w;
 
 	public ArenaCreator(Location minPoint, Location maxPoint, BlockData floorBlock,
@@ -25,7 +24,6 @@ public class ArenaCreator extends BukkitRunnable {
 		this.wall2 = wallBlock2;
 		this.line = lineBlock;
 		this.sectionHeight = wallSectionHeight;
-		this.plugin = plugin;
 		this.w = minPoint.getWorld();
 	}
 
@@ -124,7 +122,7 @@ public class ArenaCreator extends BukkitRunnable {
 					}
 
 				}
-			}.runTaskLater(plugin, 1);
+			}.runTaskLater(Plugin.plug, 1);
 			synchronized (t) {
 				try {
 					t.wait();

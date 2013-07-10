@@ -20,15 +20,15 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import static com.github.barteks2x.dodgeball.Plugin.plug;
+
 public class MinigameCommandsAndListener implements CommandExecutor, Listener {
 
-	private final Plugin plugin;
 	private final WorldEditPlugin worldedit;
 	private final DodgeballManager mm;
 	private final Map<String, Object> commands = new HashMap<String, Object>(15);
 
 	public MinigameCommandsAndListener(Plugin plugin, WorldEditPlugin worldedit) {
-		this.plugin = plugin;
 		this.worldedit = worldedit;
 		this.mm = plugin.getMinigameManager();
 		this.registerCommands();
@@ -36,7 +36,7 @@ public class MinigameCommandsAndListener implements CommandExecutor, Listener {
 
 	private void registerCommands() {
 		registerCommand(new KickPlayer(mm));
-		registerCommand(new Automake(mm, plugin, worldedit));
+		registerCommand(new Automake(mm, plug, worldedit));
 		registerCommand(new Spectate(mm));
 		registerCommand(new Delete(mm));
 		registerCommand(new Spawn(mm));
@@ -154,7 +154,7 @@ public class MinigameCommandsAndListener implements CommandExecutor, Listener {
 	@EventHandler()
 	public void onEntityDamageEntity(EntityDamageByEntityEvent e) {
 		EntityDamageByEntityHandler eh = new EntityDamageByEntityHandler(e);
-		eh.runTask(plugin);
+		eh.runTask(plug);
 	}
 
 	@EventHandler()

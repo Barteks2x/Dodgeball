@@ -11,11 +11,9 @@ class PlayerData {
 
 	private final Player p;
 	private final ItemStack[] inventory;
-	private final int health;
 	private final float exp;
 	private final ItemStack boots, leggins, chestplate, helmet;
 	private final float exhausion;
-	private final int food;
 	private final int maxHealth;
 	private final Location loc;
 	private final Dodgeball m;
@@ -24,14 +22,12 @@ class PlayerData {
 	public PlayerData(DodgeballPlayer mp) {
 		this.p = mp.getPlayer();
 		this.inventory = p.getInventory().getContents();
-		this.health = p.getHealth();
 		this.exp = p.getExp();
-		this.helmet = p.getEquipment().getHelmet();
-		this.chestplate = p.getEquipment().getChestplate();
-		this.leggins = p.getEquipment().getLeggings();
-		this.boots = p.getEquipment().getBoots();
+		this.helmet = p.getInventory().getHelmet();
+		this.chestplate = p.getInventory().getChestplate();
+		this.leggins = p.getInventory().getLeggings();
+		this.boots = p.getInventory().getBoots();
 		this.exhausion = p.getExhaustion();
-		this.food = p.getFoodLevel();
 		this.maxHealth = p.getMaxHealth();
 		this.loc = p.getLocation();
 		this.m = mp.getMinigame();
@@ -41,10 +37,10 @@ class PlayerData {
 	public void restorePlayerData() {
 		p.getInventory().setContents(inventory);
 		p.setExp(exp);
-		p.getEquipment().setBoots(boots);
-		p.getEquipment().setLeggings(leggins);
-		p.getEquipment().setChestplate(chestplate);
-		p.getEquipment().setHelmet(helmet);
+		p.getInventory().setBoots(boots);
+		p.getInventory().setLeggings(leggins);
+		p.getInventory().setChestplate(chestplate);
+		p.getInventory().setHelmet(helmet);
 		p.setExhaustion(exhausion);
 		p.setFoodLevel(20);
 		p.setMaxHealth(maxHealth);

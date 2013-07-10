@@ -13,10 +13,11 @@ public class Plugin extends JavaPlugin {
 
 	private WorldEditPlugin worldedit;
 	private DodgeballManager mm;
-	public static Plugin instance;
+	public static Plugin plug;
 
 	@Override
 	public void onEnable() {
+		plug = this;
 		worldedit = (WorldEditPlugin)Bukkit.getServer().getPluginManager().getPlugin("WorldEdit");
 		File dir = this.getDataFolder();
 		if (dir.exists() && !dir.isDirectory()) {
@@ -62,14 +63,14 @@ public class Plugin extends JavaPlugin {
 			}
 		}
 		if (mm == null) {
-			mm = new DodgeballManager().init(this);
+			mm = new DodgeballManager();
 		}
+		mm.init(this);
 		CommandExecutor exec = new MinigameCommandsAndListener(this, worldedit);
 		Listener l = (Listener)exec;
 		getServer().getPluginManager().registerEvents(l, this);
 		getCommand("db").setExecutor(exec);
 		getServer().getPluginManager().registerEvents(mm, this);
-		instance = this;
 	}
 
 	@Override

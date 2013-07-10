@@ -36,9 +36,9 @@ public class LocationSerializable implements Serializable {
 
 	public Location getLocation() {
 		if (worldObj == null) {
-			this.worldObj = Plugin.instance.getServer().getWorld(world);
+			this.worldObj = Plugin.plug.getServer().getWorld(world);
 			if (worldObj == null) {
-				Plugin.instance.getLogger().warning("Couldn't find world: " + world);
+				Plugin.plug.getLogger().warning("Couldn't find world: " + world);
 			}
 		}
 		return new Location(worldObj, x, y, z);

@@ -9,23 +9,23 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import static com.github.barteks2x.dodgeball.Plugin.plug;
+
 public class DodgeballManager implements Listener, Serializable {
 
 	private static final long serialVersionUID = 3243645834925L;
 	private final HashMap<String, Dodgeball> minigames;
-	private final HashMap<String, DodgeballPlayer> players;
-	private final HashMap<String, PlayerData> playersData;
-	private transient Plugin plug;
+	private transient HashMap<String, DodgeballPlayer> players;
+	private transient HashMap<String, PlayerData> playersData;
 	private final Random rand = new Random();
 
 	public DodgeballManager() {
-		this.playersData = new HashMap<String, PlayerData>(20);
-		this.players = new HashMap<String, DodgeballPlayer>(20);
 		this.minigames = new HashMap<String, Dodgeball>(5);
 	}
 
 	public DodgeballManager init(Plugin plug) {
-		this.plug = plug;
+		this.playersData = new HashMap<String, PlayerData>(plug.getServer().getMaxPlayers() + 5);
+		this.players = new HashMap<String, DodgeballPlayer>(plug.getServer().getMaxPlayers() + 5);
 		return this;
 	}
 
@@ -180,12 +180,12 @@ public class DodgeballManager implements Listener, Serializable {
 		new BukkitRunnable() {
 			public void run() {
 				new StartMinigameTask(m).runTaskLater(plug, 30 * 20);
-				new SendMessageTask("30 seconds to start minigame...").runTaskLater(plug, 30 * 20);
-				new SendMessageTask("20 seconds to start minigame...").runTaskLater(plug, 20 * 20);
+				new SendMessageTask("30 seconds to start minigame...").runTask(plug);
+				new SendMessageTask("20 seconds to start minigame...").runTaskLater(plug, 10 * 20);
 				new SendMessageTask("15 seconds to start minigame...").runTaskLater(plug, 15 * 20);
 				for (int i = 10; i > 0; --i) {
-					new SendMessageTask(i + " seconds to start minigame...").runTaskLater(plug, i *
-							20);
+					new SendMessageTask(i + " seconds to start minigame...").runTaskLater(plug,
+							(30 * 20) - i * 20);
 				}
 			}
 

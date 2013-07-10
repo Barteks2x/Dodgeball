@@ -16,12 +16,12 @@ import org.bukkit.util.Vector;
 public class Dodgeball implements Serializable {
 
 	private static final long serialVersionUID = 342134832462L;
-	public final ArrayList<DodgeballPlayer> playerList = new ArrayList<DodgeballPlayer>(10);
+	public transient final ArrayList<DodgeballPlayer> playerList =
+			new ArrayList<DodgeballPlayer>(10);
 	protected final CubeSerializable area;
 	private final int[] teamPlayerCount = new int[DodgeballTeam.values().length];
 	protected LocationSerializable spawn;
 	protected final String name;
-	protected final Plugin plug;
 	protected DodgeballManager mm;
 	public int players;
 	public boolean isStarted = false;
@@ -41,7 +41,6 @@ public class Dodgeball implements Serializable {
 		}
 		this.area = new CubeSerializable(minPoint, maxPoint);
 		this.name = name;
-		this.plug = plug;
 		this.mm = plug.getMinigameManager();
 		mm.addMinigame(this);
 		World w = minPoint.getWorld();
@@ -158,6 +157,7 @@ public class Dodgeball implements Serializable {
 		teamPlayerCount[p.getTeam().ordinal()]--;
 		players--;
 		playerList.remove(p);
+		stopIfDone();
 	}
 
 	public double getSpawnX(DodgeballPlayer p) {

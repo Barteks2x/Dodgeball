@@ -1,5 +1,5 @@
 name: Dodgeball
-version: 0.1-12-g464eaed
+version: 0.2
 description: Plugin for MiniElementGaming Minecraft server
 author: Barteks2x
 main: com.github.barteks2x.dodgeball.Plugin
@@ -21,9 +21,6 @@ commands:
         /db kickplayer <minigame-name> <player>
         /db join <name> - join minigame
         /db leave - leave minigame
-  dbhelp:
-    description: Minigame halp
-    usage: /dbhelp [<subcommand1>] [<subcommand2>]
 permissions:
   db.admin:
     decription: Gives access to all commands recommended for admins (except reload)
@@ -32,7 +29,6 @@ permissions:
       db.start: true
       db.stop: true
       db.player: true
-      db.help: true
   db:
     description: Gives access to all dodgeball commands
     children:
@@ -41,7 +37,6 @@ permissions:
       db.start: true
       db.stop: true
       db.player: true
-      db.help: true
   db.reload:
     description: Gives access to reload dodgeball configuration
   db.automake:
@@ -64,13 +59,3 @@ permissions:
     description: Gives access to /db join (/join)
   db.leave:
     description: Gives access to /db leave (/leave)
-  db.help:
-    description: Minigame help commands
-    children:
-      db.help.admin: true
-  db.help.player:
-    description: Minigame help for players (only player commands)
-  db.help.admin:
-    description: Minigame help for admins (all commands)
-    children:
-      db.help.player: true

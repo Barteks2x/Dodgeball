@@ -1,6 +1,6 @@
 package com.github.barteks2x.dodgeball.command;
 
-import com.github.barteks2x.dodgeball.MinigameManager;
+import com.github.barteks2x.dodgeball.DodgeballManager;
 import java.util.Iterator;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -9,9 +9,9 @@ import static org.bukkit.ChatColor.*;
 
 public class Spawn {
 
-	private final MinigameManager mm;
+	private final DodgeballManager mm;
 
-	public Spawn(MinigameManager mm) {
+	public Spawn(DodgeballManager mm) {
 		this.mm = mm;
 	}
 

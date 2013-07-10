@@ -1,6 +1,5 @@
 package com.github.barteks2x.dodgeball;
 
-
 import java.lang.reflect.Method;
 import org.bukkit.*;
 import org.bukkit.entity.Firework;
@@ -48,7 +47,8 @@ public class FireworkEffectPlayer {
 	 *                 <p/>
 	 * @throws Exception
 	 */
-	public static void playFirework(World world, Location loc, FireworkEffect fe) throws Exception {
+	public static void playFirework(World world, Location loc, FireworkEffect fe, int power) throws
+			Exception {
 		// Bukkity load (CraftFirework)
 		Firework fw = world.spawn(loc, Firework.class);
 		// the net.minecraft.server.World
@@ -78,8 +78,8 @@ public class FireworkEffectPlayer {
 		FireworkMeta data = fw.getFireworkMeta();
 		// clear existing
 		data.clearEffects();
-		// power of one
-		data.setPower(1);
+		// --power of one-- power as parameter
+		data.setPower(power);
 		// add the effect
 		data.addEffect(fe);
 		// set the meta

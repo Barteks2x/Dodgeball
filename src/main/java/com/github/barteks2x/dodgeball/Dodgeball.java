@@ -1,5 +1,7 @@
 package com.github.barteks2x.dodgeball;
 
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Random;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
@@ -7,24 +9,41 @@ import org.bukkit.entity.Snowball;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
-public class Dodgeball extends Minigame {
+public class Dodgeball implements Serializable {
 
-	private static final long serialVersionUID = 3612989452554623L;
+	private static final long serialVersionUID = 342134832462L;
+	public final ArrayList<DodgeballPlayer> playerList = new ArrayList<DodgeballPlayer>(10);
+	protected final CubeSerializable area;
+	private final int[] teamPlayerCount = new int[DodgeballTeam.values().length];
+	protected LocationSerializable spawn;
+	protected final String name;
+	protected final Plugin plug;
+	protected DodgeballManager mm;
+	public int players;
+	public boolean isStarted = false;
+	public int maxPlayers;
+	public int votes;
 	private final CubeSerializable TEAM_1_AREA;
 	private final CubeSerializable TEAM_2_AREA;
 	private final CubeSerializable SPECTATE_AREA;
 	private final DodgeballTeam TEAM_1, TEAM_2;
-	private final transient Random rand = new Random();
+	private final Random rand = new Random();
 	private final double TEAM_1_SPAWN_X, TEAM_2_SPAWN_X;
 
 	public Dodgeball(Plugin plug, Location minPoint, Location maxPoint, String name,
 			DodgeballTeam team1, DodgeballTeam team2) {
-		super(plug, minPoint, maxPoint, MinigameEnum.DB, name);
+		if (minPoint.equals(maxPoint)) {
+			throw new IllegalArgumentException("Arena size is zero!");
+		}
+		this.area = new CubeSerializable(minPoint, maxPoint);
+		this.name = name;
+		this.plug = plug;
+		this.mm = plug.getMinigameManager();
+		mm.addMinigame(this);
 		World w = minPoint.getWorld();
 		double minX1 = minPoint.getX();
 		double minY1 = minPoint.getY();
@@ -50,47 +69,20 @@ public class Dodgeball extends Minigame {
 				0)).getLocation(), maxPoint);
 		this.maxPlayers = (int)((maxPoint.getX() - minPoint.getX()) * (maxPoint.getZ() - minPoint.
 				getZ()) / (8F + 1F / 3F));
+
 	}
 
-	@Override
 	public void handlePlayerMove(PlayerMoveEvent e) {
 		DodgeballPlayer p = mm.getMinigamePlayer(e.getPlayer().getName());
 		p.update(mm, getPlayerTeamArea(p), SPECTATE_AREA, e.getTo());
 	}
 
-	@Override
-	public boolean hasTeam(String team) {
-		if (TEAM_1.toString().equals(team) || TEAM_2.toString().equals(team)) {
-			return true;
-		}
-		return false;
-	}
-
-	@Override
-	public void onStop() {
-		isStarted = false;
-	}
-
-	@Override
 	public void handlePlayerInventoryClick(InventoryClickEvent e) {
 		if (e.getCurrentItem().getType() == Material.WOOL) {
 			e.setCancelled(true);
 		}
 	}
 
-	private CubeSerializable getPlayerTeamArea(DodgeballPlayer p) {
-		if (p.getTeam() == TEAM_1) {
-			return TEAM_1_AREA;
-		} else {
-			return TEAM_2_AREA;
-		}
-	}
-
-	@Override
-	public void handlePlayerInteract(PlayerInteractEvent e) {
-	}
-
-	@Override
 	public void handleEntityDamageByEntity(EntityDamageByEntityEvent e) {
 		if (!isStarted) {
 			e.setCancelled(true);
@@ -119,9 +111,31 @@ public class Dodgeball extends Minigame {
 
 		mp.health -= 2;
 		mp.update(mm, getPlayerTeamArea(mp), SPECTATE_AREA, player.getLocation());
+		this.stopIfDone();
 	}
 
-	@Override
+	public void handleProjectileHitEvent(ProjectileHitEvent e) {
+		if (e.getEntity() instanceof Snowball) {
+			Snowball s = (Snowball)e.getEntity();
+			if (area.isInArea(s.getLocation())) {
+				s.getWorld().dropItem(s.getLocation(), new ItemStack(Material.SNOW_BALL, 1));
+				s.remove();
+			}
+		}
+	}
+
+	public boolean hasTeam(String team) {
+		if (TEAM_1.toString().equals(team) || TEAM_2.toString().equals(team)) {
+			return true;
+		}
+		return false;
+	}
+
+	public void onStop() {
+		isStarted = false;
+		area.removeNonPlayerEntities();
+	}
+
 	public void onStart() {
 		isStarted = true;
 		DodgeballPlayer parray[] = new DodgeballPlayer[1];
@@ -134,21 +148,29 @@ public class Dodgeball extends Minigame {
 		}
 	}
 
-	@Override
-	public void handleProjectileHitEvent(ProjectileHitEvent e) {
-		if (e.getEntity() instanceof Snowball) {
-			Snowball s = (Snowball)e.getEntity();
-			if (area.isInArea(s.getLocation())) {
-				s.getWorld().dropItem(s.getLocation(), new ItemStack(Material.SNOW_BALL, 1));
-				s.remove();
-			}
-		}
+	public void onPlayrJoin(DodgeballPlayer p) {
+		teamPlayerCount[p.getTeam().ordinal()]++;
+		players++;
+		playerList.add(p);
 	}
 
-	@Override
+	public void onPlayerLeave(DodgeballPlayer p) {
+		teamPlayerCount[p.getTeam().ordinal()]--;
+		players--;
+		playerList.remove(p);
+	}
+
 	public double getSpawnX(DodgeballPlayer p) {
 		DodgeballTeam t = p.getTeam();
 		return t == TEAM_1 ? TEAM_1_SPAWN_X : TEAM_2_SPAWN_X;
+	}
+
+	private CubeSerializable getPlayerTeamArea(DodgeballPlayer p) {
+		if (p.getTeam() == TEAM_1) {
+			return TEAM_1_AREA;
+		} else {
+			return TEAM_2_AREA;
+		}
 	}
 
 	protected void setPlayerAtRandomLocation(Player player) {
@@ -165,18 +187,51 @@ public class Dodgeball extends Minigame {
 		player.teleport(l);
 	}
 
-	@Override
 	public DodgeballTeam autoSelectTeam() {
 		if (teamPlayerCount[TEAM_1.ordinal()] > teamPlayerCount[TEAM_2.ordinal()]) {
-			teamPlayerCount[TEAM_2.ordinal()] += 1;
-			return DodgeballTeam.values()[TEAM_1.ordinal()];
+			return TEAM_2;
 		}
 		if (teamPlayerCount[TEAM_1.ordinal()] < teamPlayerCount[TEAM_2.ordinal()]) {
-			teamPlayerCount[TEAM_1.ordinal()] += 1;
-			return DodgeballTeam.values()[TEAM_1.ordinal()];
+			return TEAM_1;
 		}
 
 		return rand.nextBoolean() ? DodgeballTeam.values()[TEAM_1.ordinal()] :
 				DodgeballTeam.values()[TEAM_2.ordinal()];
+	}
+
+	public boolean isDone() {
+		return players != 0 &&
+				(teamPlayerCount[TEAM_1.ordinal()] == 0 || teamPlayerCount[TEAM_2.ordinal()] == 0);
+	}
+
+	public DodgeballTeam getWinnerTeam() {
+		if (teamPlayerCount[TEAM_1.ordinal()] > teamPlayerCount[TEAM_2.ordinal()]) {
+			return TEAM_1;
+		}
+		if (teamPlayerCount[TEAM_2.ordinal()] > teamPlayerCount[TEAM_1.ordinal()]) {
+			return TEAM_2;
+		}
+		return null;
+	}
+
+	public Location getSpawn() {
+		if (spawn == null) {
+			return null;
+		}
+		return spawn.getLocation();
+	}
+
+	public void setSpawn(Location loc) {
+		this.spawn = new LocationSerializable(loc);
+	}
+
+	public String getName() {
+		return this.name;
+	}
+
+	private void stopIfDone() {
+		if (isDone()) {
+			onStop();
+		}
 	}
 }

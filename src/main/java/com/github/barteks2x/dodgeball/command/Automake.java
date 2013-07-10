@@ -12,7 +12,7 @@ import static org.bukkit.ChatColor.*;
 
 public class Automake {
 
-	private final MinigameManager mm;
+	private final DodgeballManager mm;
 	private final WorldEditPlugin worldedit;
 	private final Plugin plugin;
 	private final int minArenaSizeXZ = 10;
@@ -21,7 +21,7 @@ public class Automake {
 	private final String toosmallarenamsg = "Too small arena! Arena must be at least " +
 			minArenaSizeXZ + "x" + minArenaSizeY + "x" + minArenaSizeXZ;
 
-	public Automake(MinigameManager mm, Plugin plugin, WorldEditPlugin worldedit) {
+	public Automake(DodgeballManager mm, Plugin plugin, WorldEditPlugin worldedit) {
 		this.mm = mm;
 		this.plugin = plugin;
 		this.worldedit = worldedit;
@@ -29,6 +29,10 @@ public class Automake {
 
 	@DBCommand
 	public boolean automake(CommandSender sender, Iterator<String> args) {
+		if (!(sender instanceof Player)) {
+			sender.sendMessage("This command can be used only by player!");
+			return true;
+		}
 		if (!sender.hasPermission("db.automake")) {
 			sender.sendMessage(RED + "You don't have permission to use this command!");
 			return true;
@@ -102,8 +106,7 @@ public class Automake {
 		ArenaCreator creator = new ArenaCreator(minPoint, maxPoint, blocks[0],
 				blocks[1], blocks[2], blocks[3], sectionHeight, plugin);
 		creator.runTaskAsynchronously(plugin);//avoid lag when command is executed
-		Minigame arena = new Dodgeball(plugin, minPoint, maxPoint, name, team1, team2);
-		mm.addMinigame(arena);
+		Dodgeball arena = new Dodgeball(plugin, minPoint, maxPoint, name, team1, team2);//added to mm automatically
 		sender.sendMessage(GREEN + "Building dodgeball arena...");
 		return true;
 	}

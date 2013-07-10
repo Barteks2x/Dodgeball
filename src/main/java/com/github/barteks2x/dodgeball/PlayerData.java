@@ -18,7 +18,7 @@ class PlayerData {
 	private final int food;
 	private final int maxHealth;
 	private final Location loc;
-	private final Minigame m;
+	private final Dodgeball m;
 	private final Collection<PotionEffect> potions;
 
 	public PlayerData(DodgeballPlayer mp) {

@@ -1,5 +1,6 @@
 package com.github.barteks2x.dodgeball;
 
+import java.io.Serializable;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -8,19 +9,24 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
 
-public class MinigameManager implements Listener {
+public class DodgeballManager implements Listener, Serializable {
 
-	private final Map<String, Minigame> minigames;
-	private final Map<String, DodgeballPlayer> players;
-	private final Map<String, PlayerData> playersData;
-	private final Plugin plug;
+	private static final long serialVersionUID = 3243645834925L;
+	private final HashMap<String, Dodgeball> minigames;
+	private final HashMap<String, DodgeballPlayer> players;
+	private final HashMap<String, PlayerData> playersData;
+	private transient Plugin plug;
 	private final Random rand = new Random();
 
-	public MinigameManager(Plugin plug) {
-		this.playersData = new HashMap<String, PlayerData>(plug.getServer().getMaxPlayers());
-		this.players = new HashMap<String, DodgeballPlayer>(plug.getServer().getMaxPlayers());
-		this.minigames = new HashMap<String, Minigame>(5);
+	public DodgeballManager() {
+		this.playersData = new HashMap<String, PlayerData>(20);
+		this.players = new HashMap<String, DodgeballPlayer>(20);
+		this.minigames = new HashMap<String, Dodgeball>(5);
+	}
+
+	public DodgeballManager init(Plugin plug) {
 		this.plug = plug;
+		return this;
 	}
 
 	public boolean addPlayer(DodgeballPlayer p) {
@@ -30,20 +36,15 @@ public class MinigameManager implements Listener {
 		}
 
 		Player pl = p.getPlayer();
-		final Minigame m = p.getMinigame();
+		final Dodgeball m = p.getMinigame();
 		playersData.put(pl.getName(), new PlayerData(p));
 		players.put(pl.getName(), p);
 		pl.getInventory().clear();
 		pl.getEquipment().clear();
-		m.playerList.add(p);
-		m.players++;
+		m.onPlayrJoin(p);
 		m.setPlayerAtRandomLocation(pl);
 		if (m.playerList.toArray().length >= m.maxPlayers) {
-			new BukkitRunnable() {
-				public void run() {
-					m.onStart();
-				}
-			}.runTaskLater(plug, 20 * 30);
+			startMinigameDelayed(m);
 		} else {
 			pl.sendMessage(ChatColor.GOLD +
 					"Use /db vote to vote on starting minigame before it's full.");
@@ -51,7 +52,7 @@ public class MinigameManager implements Listener {
 		return true;
 	}
 
-	public boolean addMinigame(Minigame m) {
+	public boolean addMinigame(Dodgeball m) {
 		if (minigames.containsValue(m)) {
 			return false;
 		}
@@ -63,23 +64,19 @@ public class MinigameManager implements Listener {
 		if (!players.containsValue(p)) {
 			return false;
 		}
-		Minigame m = p.getMinigame();
+		Dodgeball m = p.getMinigame();
 		Player pl = p.getPlayer();
 		if (m.getSpawn() != null) {
 			pl.teleport(m.getSpawn());
 		}
-		m.teamPlayerCount[p.getTeam().ordinal()]--;
+		m.onPlayerLeave(p);
 		playersData.get(pl.getName()).restorePlayerData();
 		players.remove(pl.getName());
-		m.playerList.remove(p);
-		m.players--;
-		if (m.teamPlayerCount[0] == 0 || m.teamPlayerCount[1] == 0) {
-			stopMinigame(m);
-		}
+		m.onPlayerLeave(p);
 		return true;
 	}
 
-	public boolean removeMinigame(Minigame m) {
+	public boolean removeMinigame(Dodgeball m) {
 		if (!minigames.containsValue(m)) {
 			return false;
 		}
@@ -98,18 +95,18 @@ public class MinigameManager implements Listener {
 		return players.get(name);
 	}
 
-	public Minigame getPlayerMinigame(String name) {
+	public Dodgeball getPlayerMinigame(String name) {
 		if (!players.containsKey(name)) {
 			return null;
 		}
 		return players.get(name).getMinigame();
 	}
 
-	public Minigame getMinigame(String name) {
+	public Dodgeball getMinigame(String name) {
 		return minigames.get(name);
 	}
 
-	public Iterator<Minigame> getMinigames() {
+	public Iterator<Dodgeball> getMinigames() {
 		return minigames.values().iterator();
 	}
 
@@ -117,24 +114,21 @@ public class MinigameManager implements Listener {
 		return players.containsKey(name);
 	}
 
-	public DodgeballPlayer createPlayer(Player p, Minigame m, String team) {
+	public DodgeballPlayer createPlayer(Player p, Dodgeball m, String team) {
 		if (m.hasTeam(team)) {
 			return new DodgeballPlayer(p, DodgeballTeam.valueOf(team), m);
 		}
 		return new DodgeballPlayer(p, m.autoSelectTeam(), m);
 	}
 
-	public DodgeballPlayer createPlayer(Player p, Minigame m) {
+	public DodgeballPlayer createPlayer(Player p, Dodgeball m) {
 		return createPlayer(p, m, null);
 	}
 
 	public void setPlayerSpactate(DodgeballPlayer p) {
 		p.isSpectator = true;
 		p.getMinigame().players--;
-		final Minigame m = p.getMinigame();
-		if (m.teamPlayerCount[0] == 0 || m.teamPlayerCount[1] == 0) {
-			stopMinigame(m);
-		}
+		final Dodgeball m = p.getMinigame();
 	}
 
 	public void stopMinigame(String name) {
@@ -143,43 +137,28 @@ public class MinigameManager implements Listener {
 		}
 	}
 
-	public void vote(final Minigame m) {
+	public void vote(final Dodgeball m) {
 		m.votes++;
 		if (m.votes >= .5F * m.maxPlayers) {
-			new BukkitRunnable() {
-				public void run() {
-					m.onStart();
-				}
-			}.runTaskLater(plug, 30 * 20);
+			startMinigameDelayed(m);
 		}
 	}
 
-	private void stopMinigame(final Minigame m) {
+	private void stopMinigame(final Dodgeball m) {
 		if (!m.isStarted) {
 			return;
 		}
 
 		new BukkitRunnable() {
-			private void stopMinigame_exec(Minigame m) {
+			private void stopMinigame_exec(Dodgeball m) {
+				DodgeballTeam winnerTeam = m.getWinnerTeam();
 				m.onStop();
-				int[] teams = m.teamPlayerCount;
-				int[] ateams = new int[2];
-				int n = 0;
-				for (int i = 0; i < teams.length; ++i) {
-					if (n == 2) {
-						break;
-					}
-					if (m.hasTeam(DodgeballTeam.values()[i].toString())) {
-						ateams[n++] = i;
-					}
-				}
-				DodgeballTeam winnerTeam = teams[ateams[0]] < teams[ateams[1]] ?
-						DodgeballTeam.values()[ateams[1]] : (teams[ateams[0]] == teams[ateams[1]] ?
-						null : DodgeballTeam.values()[ateams[0]]);
+
 				List<DodgeballPlayer> players = m.playerList;
 				for (DodgeballPlayer p : players) {
-					if (winnerTeam == null || p.getTeam() == winnerTeam) {
-						p.getPlayer().sendMessage(ChatColor.GOLD + "Your team wins!");
+					if (winnerTeam != null) {
+						p.getPlayer().sendMessage(ChatColor.GOLD + "Winner team: " + winnerTeam.
+								toString().toLowerCase());
 					}
 					removePlayer(p);
 				}
@@ -194,16 +173,50 @@ public class MinigameManager implements Listener {
 			public void run() {
 				stopMinigame_exec(m);
 			}
-		}.runTaskLater(plug, 60);
+		}.runTaskLater(plug, 50);
 	}
 
-	private FireworkEffect getRandomFireworkEffect() {
-		FireworkEffect.Builder b = FireworkEffect.builder();
-		FireworkEffect.Type types[] = FireworkEffect.Type.values();
-		return b.trail(true).with(types[rand.nextInt(types.length)]).with(types[rand.nextInt(
-				types.length)]).withColor(Color.fromRGB(rand.nextInt(255), rand.nextInt(255), rand.
-				nextInt(255))).withFade(Color.fromRGB(rand.nextInt(255), rand.nextInt(255), rand.
-				nextInt(255))).build();
+	public void startMinigameDelayed(final Dodgeball m) {
+		new BukkitRunnable() {
+			public void run() {
+				new StartMinigameTask(m).runTaskLater(plug, 30 * 20);
+				new SendMessageTask("30 seconds to start minigame...").runTaskLater(plug, 30 * 20);
+				new SendMessageTask("20 seconds to start minigame...").runTaskLater(plug, 20 * 20);
+				new SendMessageTask("15 seconds to start minigame...").runTaskLater(plug, 15 * 20);
+				for (int i = 10; i > 0; --i) {
+					new SendMessageTask(i + " seconds to start minigame...").runTaskLater(plug, i *
+							20);
+				}
+			}
+
+			final class SendMessageTask extends BukkitRunnable {
+
+				String message;
+
+				public SendMessageTask(String message) {
+					this.message = message;
+				}
+
+				public void run() {
+					for (DodgeballPlayer p : m.playerList) {
+						p.getPlayer().sendMessage(message);
+					}
+				}
+			}
+
+			final class StartMinigameTask extends BukkitRunnable {
+
+				Dodgeball db;
+
+				public StartMinigameTask(Dodgeball db) {
+					this.db = db;
+				}
+
+				public void run() {
+					this.db.onStart();
+				}
+			}
+		}.runTask(plug);
 	}
 
 	private class FireworkEffectTask extends BukkitRunnable {
@@ -214,6 +227,15 @@ public class MinigameManager implements Listener {
 		public FireworkEffectTask(Long rand, CubeSerializable cube) {
 			this.rand = new Random(rand);
 			this.c = cube;
+		}
+
+		private FireworkEffect getRandomFireworkEffect() {
+			FireworkEffect.Builder b = FireworkEffect.builder();
+			FireworkEffect.Type types[] = FireworkEffect.Type.values();
+			return b.trail(rand.nextBoolean()).with(types[rand.nextInt(types.length)]).with(
+					types[rand.nextInt(types.length)]).withColor(Color.fromRGB(rand.nextInt(255),
+					rand.nextInt(255), rand.nextInt(255))).withFade(Color.fromRGB(rand.nextInt(255),
+					rand.nextInt(255), rand.nextInt(255))).flicker(rand.nextBoolean()).build();
 		}
 
 		public void run() {
@@ -228,9 +250,9 @@ public class MinigameManager implements Listener {
 			World w = c.minPoint.worldObj;
 			try {
 				FireworkEffectPlayer.playFirework(w, new Location(w, randX, randY, randZ),
-						getRandomFireworkEffect());
+						getRandomFireworkEffect(), rand.nextInt(3) + 1);
 			} catch (Exception ex) {
-				Logger.getLogger(MinigameManager.class.getName()).log(Level.SEVERE, null, ex);
+				Logger.getLogger(DodgeballManager.class.getName()).log(Level.SEVERE, null, ex);
 			}
 		}
 	}

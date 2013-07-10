@@ -14,11 +14,11 @@ public class DodgeballPlayer {
 	private final Player player;
 	public int health;
 	private double spawnX;
-	private final Minigame m;
+	private final Dodgeball m;
 	public boolean isSpectator = false;
 	private boolean updated = false;
 
-	public DodgeballPlayer(Player player, DodgeballTeam team, Minigame mg) {
+	public DodgeballPlayer(Player player, DodgeballTeam team, Dodgeball mg) {
 
 		this.player = player;
 		this.team = team;
@@ -38,7 +38,7 @@ public class DodgeballPlayer {
 		return player;
 	}
 
-	public Minigame getMinigame() {
+	public Dodgeball getMinigame() {
 		return m;
 	}
 
@@ -54,7 +54,7 @@ public class DodgeballPlayer {
 		this.spawnX = x;
 	}
 
-	public void update(MinigameManager mm, CubeSerializable ta, CubeSerializable sa, Location newLoc) {
+	public void update(DodgeballManager mm, CubeSerializable ta, CubeSerializable sa, Location newLoc) {
 		if ((isSpectator && !updated) || health <= 0) {
 			mm.setPlayerSpactate(this);
 			this.health = 20;

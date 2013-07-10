@@ -1,6 +1,7 @@
 package com.github.barteks2x.dodgeball.command;
 
-import com.github.barteks2x.dodgeball.*;
+import com.github.barteks2x.dodgeball.Dodgeball;
+import com.github.barteks2x.dodgeball.DodgeballManager;
 import java.util.Iterator;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -9,9 +10,9 @@ import static org.bukkit.ChatColor.*;
 
 public class Join {
 
-	private final MinigameManager mm;
+	private final DodgeballManager mm;
 
-	public Join(MinigameManager mm) {
+	public Join(DodgeballManager mm) {
 		this.mm = mm;
 	}
 
@@ -31,7 +32,7 @@ public class Join {
 		}
 		String n = args.next();
 		String p = ((Player)sender).getName();
-		Minigame m = mm.getMinigame(n);
+		Dodgeball m = mm.getMinigame(n);
 		if (m == null) {
 			sender.sendMessage(RED +
 					"Minigame not exist! Are you sure name is correct?\"Mini\" and \"MiNi\" are different minigames!");

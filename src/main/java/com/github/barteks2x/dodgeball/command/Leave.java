@@ -1,6 +1,6 @@
 package com.github.barteks2x.dodgeball.command;
 
-import com.github.barteks2x.dodgeball.MinigameManager;
+import com.github.barteks2x.dodgeball.DodgeballManager;
 import java.util.Iterator;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -10,9 +10,9 @@ import static org.bukkit.ChatColor.GREEN;
 
 public class Leave {
 
-	private final MinigameManager mm;
+	private final DodgeballManager mm;
 
-	public Leave(MinigameManager mm) {
+	public Leave(DodgeballManager mm) {
 		this.mm = mm;
 	}
 

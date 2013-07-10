@@ -24,7 +24,7 @@ public class MinigameCommandsAndListener implements CommandExecutor, Listener {
 
 	private final Plugin plugin;
 	private final WorldEditPlugin worldedit;
-	private final MinigameManager mm;
+	private final DodgeballManager mm;
 	private final Map<String, Object> commands = new HashMap<String, Object>(15);
 
 	public MinigameCommandsAndListener(Plugin plugin, WorldEditPlugin worldedit) {
@@ -35,7 +35,6 @@ public class MinigameCommandsAndListener implements CommandExecutor, Listener {
 	}
 
 	private void registerCommands() {
-		registerCommand(new ReloadConfig(mm));
 		registerCommand(new KickPlayer(mm));
 		registerCommand(new Automake(mm, plugin, worldedit));
 		registerCommand(new Spectate(mm));
@@ -112,7 +111,7 @@ public class MinigameCommandsAndListener implements CommandExecutor, Listener {
 
 	@EventHandler(ignoreCancelled = true)
 	public void onPlayerMove(PlayerMoveEvent e) {
-		Minigame ab = mm.getPlayerMinigame(e.getPlayer().getName());
+		Dodgeball ab = mm.getPlayerMinigame(e.getPlayer().getName());
 		if (ab == null) {
 			return;
 		}
@@ -160,7 +159,7 @@ public class MinigameCommandsAndListener implements CommandExecutor, Listener {
 
 	@EventHandler()
 	public void onProjectileHit(ProjectileHitEvent e) {
-		Iterator<Minigame> it = mm.getMinigames();
+		Iterator<Dodgeball> it = mm.getMinigames();
 		while (it.hasNext()) {
 			it.next().handleProjectileHitEvent(e);
 		}
@@ -173,7 +172,7 @@ public class MinigameCommandsAndListener implements CommandExecutor, Listener {
 			return;
 		}
 		Player p = (Player)human;
-		Minigame m;
+		Dodgeball m;
 		if ((m = mm.getPlayerMinigame(p.getName())) == null) {
 			return;
 		}
@@ -192,7 +191,7 @@ public class MinigameCommandsAndListener implements CommandExecutor, Listener {
 			if (e.getEntity() instanceof Player) {
 				if (e.getDamager() instanceof Snowball) {
 					Player p = (Player)e.getEntity();
-					Minigame m = mm.getPlayerMinigame(p.getName());
+					Dodgeball m = mm.getPlayerMinigame(p.getName());
 					if (m != null) {
 						m.handleEntityDamageByEntity(e);
 					}

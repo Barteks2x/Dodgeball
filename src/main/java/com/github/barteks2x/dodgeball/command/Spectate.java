@@ -9,9 +9,9 @@ import static org.bukkit.ChatColor.*;
 
 public class Spectate {
 
-	private final MinigameManager mm;
+	private final DodgeballManager mm;
 
-	public Spectate(MinigameManager mm) {
+	public Spectate(DodgeballManager mm) {
 		this.mm = mm;
 	}
 
@@ -36,7 +36,7 @@ public class Spectate {
 					"You can't spectate two minigames! Use /leave to leave current minigame");
 			return true;
 		}
-		Minigame m = mm.getMinigame(n);
+		Dodgeball m = mm.getMinigame(n);
 		if (m == null) {
 			sender.sendMessage(RED +
 					"Minigame not exist! Are you sure name is correct? \"Mini\" and \"MiNi\" are different minigames!");

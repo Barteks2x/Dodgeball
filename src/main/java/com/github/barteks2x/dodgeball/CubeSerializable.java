@@ -1,7 +1,8 @@
 package com.github.barteks2x.dodgeball;
 
 import java.io.Serializable;
-import org.bukkit.Location;
+import org.bukkit.*;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 public class CubeSerializable implements Serializable {
@@ -67,6 +68,28 @@ public class CubeSerializable implements Serializable {
 		}
 		if (f) {
 			p.teleport(newPos);
+		}
+	}
+
+	public void removeNonPlayerEntities() {
+		int XC = (int)minPoint.x >> 4;
+		int maxXC = (int)maxPoint.x >> 4;
+
+		int ZC = (int)minPoint.z >> 4;
+		int maxZC = (int)maxPoint.z >> 4;
+
+		World w = minPoint.worldObj;
+		for (; XC <= maxXC; ++XC) {
+			for (; ZC <= maxZC; ++ZC) {
+				Chunk chunk = w.getChunkAt(XC, ZC);
+				Entity el[] = chunk.getEntities();
+				for (Entity e : el) {
+					Location l = e.getLocation();
+					if (!(e instanceof Player) && isInArea(l)) {
+						e.remove();
+					}
+				}
+			}
 		}
 	}
 }

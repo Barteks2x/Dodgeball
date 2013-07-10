@@ -1,18 +1,17 @@
 package com.github.barteks2x.dodgeball.command;
 
-import com.github.barteks2x.dodgeball.Minigame;
-import com.github.barteks2x.dodgeball.MinigameManager;
+import com.github.barteks2x.dodgeball.Dodgeball;
+import com.github.barteks2x.dodgeball.DodgeballManager;
 import java.util.Iterator;
 import org.bukkit.command.CommandSender;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import static org.bukkit.ChatColor.RED;
 
 public class Start {
 
-	private final MinigameManager mm;
+	private final DodgeballManager mm;
 
-	public Start(MinigameManager mm) {
+	public Start(DodgeballManager mm) {
 		this.mm = mm;
 	}
 
@@ -29,17 +28,12 @@ public class Start {
 			return false;
 		}
 		String name = args.next();
-		final Minigame m = mm.getMinigame(name);
+		final Dodgeball m = mm.getMinigame(name);
 		if (m == null) {
 			sender.sendMessage(RED + "Minigame doesn't exist!");
 			return true;
 		}
-		new BukkitRunnable() {
-			public void run() {
-				m.onStart();
-			}
-		}.runTaskLater(null, 20 * 30);
-
+		mm.startMinigameDelayed(m);
 		return true;
 	}
 }

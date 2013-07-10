@@ -1,16 +1,18 @@
 package com.github.barteks2x.dodgeball.command;
 
-import com.github.barteks2x.dodgeball.Minigame;
-import com.github.barteks2x.dodgeball.MinigameManager;
+import com.github.barteks2x.dodgeball.Dodgeball;
+import com.github.barteks2x.dodgeball.DodgeballManager;
 import java.util.Iterator;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import static org.bukkit.ChatColor.RED;
+
 public class Vote {
 
-	private final MinigameManager mm;
+	private final DodgeballManager mm;
 
-	public Vote(MinigameManager mm) {
+	public Vote(DodgeballManager mm) {
 		this.mm = mm;
 	}
 
@@ -20,7 +22,12 @@ public class Vote {
 			sender.sendMessage("This command can be used only by player");
 			return true;
 		}
-		Minigame m = mm.getPlayerMinigame(sender.getName());
+		if (!sender.hasPermission("db.vote")) {
+			sender.sendMessage(RED + "You don't have permission to use this command!");
+			return true;
+		}
+
+		Dodgeball m = mm.getPlayerMinigame(sender.getName());
 		mm.vote(m);
 		return true;
 	}

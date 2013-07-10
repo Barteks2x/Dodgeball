@@ -153,7 +153,8 @@ public class DodgeballManager implements Listener, Serializable {
 			return;
 		}
 		DodgeballTeam winnerTeam = m.getWinnerTeam();
-		List<DodgeballPlayer> pList = m.playerList;
+		DodgeballPlayer[] pList = new DodgeballPlayer[1];
+		pList = m.playerList.toArray(pList);
 		for (DodgeballPlayer p : pList) {
 			if (winnerTeam != null) {
 				p.getPlayer().sendMessage(ChatColor.GOLD + "Winner team: " + winnerTeam.

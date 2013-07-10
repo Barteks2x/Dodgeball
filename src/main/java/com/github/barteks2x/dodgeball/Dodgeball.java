@@ -203,8 +203,8 @@ public class Dodgeball implements Serializable {
 	}
 
 	public boolean isDone() {
-		return players != 0 &&
-				(teamPlayerCount[TEAM_1.ordinal()] == 0 || teamPlayerCount[TEAM_2.ordinal()] == 0);
+		return players > 0 &&
+				(teamPlayerCount[TEAM_1.ordinal()] <= 0 || teamPlayerCount[TEAM_2.ordinal()] <= 0);
 	}
 
 	public DodgeballTeam getWinnerTeam() {

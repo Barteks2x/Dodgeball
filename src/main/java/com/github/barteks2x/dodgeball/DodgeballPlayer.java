@@ -17,7 +17,6 @@ public class DodgeballPlayer {
 	private double spawnX;
 	private final Dodgeball m;
 	public boolean isSpectator = false;
-	private boolean updated = false;
 
 	public DodgeballPlayer(Player player, DodgeballTeam team, Dodgeball mg) {
 		this.pName = player.getName();
@@ -61,7 +60,7 @@ public class DodgeballPlayer {
 
 	public void update(DodgeballManager mm, CubeSerializable ta, CubeSerializable sa,
 			Location newLoc) {
-		if ((isSpectator && !updated) || health <= 0) {
+		if (health <= 0) {
 			mm.setPlayerSpactate(this);
 			this.health = 20;
 			player.setAllowFlight(true);
@@ -73,14 +72,13 @@ public class DodgeballPlayer {
 			pi.setChestplate(null);
 			pi.setHelmet(null);
 			pi.setLeggings(null);
-			updated = true;
+			m.onPlayerDeath(this);
 		}
 		player.setHealth(Math.max(0, health));
 		player.setFoodLevel(10);
 		if (isSpectator) {
 			player.setAllowFlight(true);
 			player.setFlying(true);
-			m.onPlayerDeath(this);
 			sa.setPlayerInArea(player, newLoc);
 		} else {
 			ta.setPlayerInArea(player, newLoc);

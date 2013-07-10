@@ -80,6 +80,7 @@ public class DodgeballPlayer {
 		if (isSpectator) {
 			player.setAllowFlight(true);
 			player.setFlying(true);
+			m.onPlayerDeath(this);
 			sa.setPlayerInArea(player, newLoc);
 		} else {
 			ta.setPlayerInArea(player, newLoc);

@@ -1,5 +1,5 @@
 name: Dodgeball
-version: 0.3
+version: 0.3-1-ga4abcdf
 description: Plugin for MiniElementGaming Minecraft server
 author: Barteks2x
 main: com.github.barteks2x.dodgeball.Plugin

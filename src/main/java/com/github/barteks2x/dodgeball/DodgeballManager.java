@@ -139,7 +139,7 @@ public class DodgeballManager implements Listener, Serializable {
 
 	public void vote(final Dodgeball m) {
 		m.votes++;
-		if (m.votes >= .5F * m.maxPlayers) {
+		if (m.votes >= .5F * m.playerList.toArray().length) {
 			startMinigameDelayed(m);
 		}
 	}
@@ -148,22 +148,20 @@ public class DodgeballManager implements Listener, Serializable {
 		if (!m.isStarted) {
 			return;
 		}
-
+		DodgeballTeam winnerTeam = m.getWinnerTeam();
+		List<DodgeballPlayer> pList = m.playerList;
+		for (DodgeballPlayer p : pList) {
+			if (winnerTeam != null) {
+				p.getPlayer().sendMessage(ChatColor.GOLD + "Winner team: " + winnerTeam.
+						toString().toLowerCase());
+			}
+			removePlayer(p);
+		}
 		new BukkitRunnable() {
 			private void stopMinigame_exec(Dodgeball m) {
-				DodgeballTeam winnerTeam = m.getWinnerTeam();
 				m.onStop();
 
-				List<DodgeballPlayer> players = m.playerList;
-				for (DodgeballPlayer p : players) {
-					if (winnerTeam != null) {
-						p.getPlayer().sendMessage(ChatColor.GOLD + "Winner team: " + winnerTeam.
-								toString().toLowerCase());
-					}
-					removePlayer(p);
-				}
-
-				int fireworks = rand.nextInt(50) + 30;
+				int fireworks = 10;
 				for (int i = 0; i < fireworks; ++i) {
 					new FireworkEffectTask(rand.nextLong(), m.area).runTaskLater(plug, rand.nextInt(
 							100) + 101);
@@ -173,7 +171,7 @@ public class DodgeballManager implements Listener, Serializable {
 			public void run() {
 				stopMinigame_exec(m);
 			}
-		}.runTaskLater(plug, 50);
+		}.runTaskLater(plug, 30 * 20);
 	}
 
 	public void startMinigameDelayed(final Dodgeball m) {

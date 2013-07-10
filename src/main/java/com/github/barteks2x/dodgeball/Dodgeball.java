@@ -154,7 +154,6 @@ public class Dodgeball implements Serializable {
 	}
 
 	public void onPlayerLeave(DodgeballPlayer p) {
-		teamPlayerCount[p.getTeam().ordinal()]--;
 		players--;
 		playerList.remove(p);
 		stopIfDone();
@@ -163,6 +162,10 @@ public class Dodgeball implements Serializable {
 	public double getSpawnX(DodgeballPlayer p) {
 		DodgeballTeam t = p.getTeam();
 		return t == TEAM_1 ? TEAM_1_SPAWN_X : TEAM_2_SPAWN_X;
+	}
+
+	public void onPlayerDeath(DodgeballPlayer p) {
+		teamPlayerCount[p.getTeam().ordinal()]--;
 	}
 
 	private CubeSerializable getPlayerTeamArea(DodgeballPlayer p) {

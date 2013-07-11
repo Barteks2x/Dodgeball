@@ -10,8 +10,8 @@ Create dodgeball arena automatically - select area with worldedit and use one co
 
 Starts automatically when there are enough players
 
-
 Selecting team when joining (permission)
+
 Two teams, colors selected when creating arena
 
 Autosave when disabling plugin.
@@ -19,12 +19,9 @@ Autosave when disabling plugin.
 Commands
 --------
 
-/db am /db automake - create arena. 
-
+/db am /db automake - create arena.
 Usage:/db am team1Color:team2Color name floor_block_id wall_block_id_1 wall_id_2 line_id height 
-
 height - wall blocks below the specified height are floor_id_1, other are wall_id_2, 
-
 permission: db.automake
 
 

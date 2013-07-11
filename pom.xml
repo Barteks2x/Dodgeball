@@ -5,7 +5,7 @@
 	<artifactId>dodgeball</artifactId>
 	<version>0.6</version>
 	<name>Dodgeball</name>
-	<description>Plugin for MiniElementGaming Minecraft server</description>
+	<description>Dodgeball plugin for Bukkit server</description>
 	<properties>
 		<gitdescribe-prefix></gitdescribe-prefix>
 		<gitdescribe-suffix></gitdescribe-suffix>

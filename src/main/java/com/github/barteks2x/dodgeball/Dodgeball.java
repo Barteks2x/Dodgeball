@@ -175,6 +175,7 @@ public class Dodgeball implements Serializable {
 
 	public void onPlayerDeath(DodgeballPlayer p) {
 		teamPlayerCount[p.getTeam().ordinal()]--;
+		p.isSpectator = true;
 		stopIfDone();
 	}
 

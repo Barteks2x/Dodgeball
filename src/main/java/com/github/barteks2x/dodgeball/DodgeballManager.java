@@ -148,6 +148,7 @@ public class DodgeballManager implements Listener, Serializable {
 		}
 		final DodgeballTeam winnerTeam = m.getWinnerTeam();
 		final DodgeballPlayer[] pList = new DodgeballPlayer[m.playerList.toArray().length + 1];
+		m.isStarted = false;//to avoid StackOverflowError (infinite recrusion)
 		m.playerList.toArray(pList);
 		for (DodgeballPlayer p : pList) {
 			if (p == null) {
@@ -155,6 +156,7 @@ public class DodgeballManager implements Listener, Serializable {
 			}
 			m.onPlayerDeath(p);//set player spectator
 		}
+		m.isStarted = true;
 		int fireworks = 10;
 		for (int i = 0; i < fireworks; ++i) {
 			new FireworkEffectTask(rand.nextLong(), m.area).runTaskLater(plug,
@@ -163,12 +165,13 @@ public class DodgeballManager implements Listener, Serializable {
 		new BukkitRunnable() {
 			private void stopMinigame_exec(Dodgeball m) {
 				m.onStop();
-
 				for (DodgeballPlayer p : pList) {
+					if (p == null) {
+						continue;
+					}
 					if (winnerTeam != null) {
 						p.getPlayer().sendMessage(ChatColor.GOLD + "Winner team: " + winnerTeam.
-								getColor() + winnerTeam.
-								toString().toLowerCase());
+								getColor() + winnerTeam.toString().toLowerCase());
 					}
 					removePlayer(p);
 				}
@@ -181,6 +184,9 @@ public class DodgeballManager implements Listener, Serializable {
 	}
 
 	public void startMinigameDelayed(final Dodgeball m) {
+		if (m.isStarted) {
+			return;
+		}
 		new BukkitRunnable() {
 			public void run() {
 				new StartMinigameTask(m).runTaskLater(plug, 30 * 20);

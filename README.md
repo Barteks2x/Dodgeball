@@ -7,23 +7,45 @@ Features
 --------
 
 Create dodgeball arena automatically - select area with worldedit and use one command to create arena
+
 Starts automatically when there are enough players
+
+
 Selecting team when joining (permission)
 Two teams, colors selected when creating arena
+
 Autosave when disabling plugin.
+
 Commands
 --------
 
-/db am /db automake - create arena. Usage:/db am team1Color:team2Color name floor_block_id wall_block_id_1 wall_id_2 line_id height height - wall blocks below the specified height are floor_id_1, other are wall_id_2, permission: db.automake
+/db am /db automake - create arena. 
+
+Usage:/db am team1Color:team2Color name floor_block_id wall_block_id_1 wall_id_2 line_id height 
+
+height - wall blocks below the specified height are floor_id_1, other are wall_id_2, 
+
+permission: db.automake
+
+
 /db start name- start dodgeball (after 30 seconds), permission: db.start
+
 /db stop name- stop dodgeball (after 10 seconds), permission: db.stop
+
 /db join name - join, permission: db.join
+
 /db leave - leave, permission: db.leave
+
 /db help - help, no permission needed
+
 /db kickplayer - kick player from dodgeball, permission: db.kickplayer
+
 /db list page- list minigames, permissions: db.list
+
 /db spawn /db setspawn - set lobby spawn, permission: db.setspawn
+
 /db spectate - join dodgeball as spectator, permission: db.spectate
+
 /db vote - vote on starting current dodgeball before maximum amount of players joins. permission: db.vote
 NOTE
 ====

@@ -59,3 +59,5 @@ permissions:
     description: Gives access to /db join (/join)
   db.leave:
     description: Gives access to /db leave (/leave)
+  db.list:
+    description: Gives access to /db list command

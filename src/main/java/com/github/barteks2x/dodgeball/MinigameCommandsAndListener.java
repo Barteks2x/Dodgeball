@@ -38,6 +38,7 @@ public class MinigameCommandsAndListener implements CommandExecutor, Listener {
 		registerCommand(new Automake(mm, plug, worldedit));
 		registerCommand(new Spectate(mm));
 		registerCommand(new Delete(mm));
+		registerCommand(new ListDB(mm));
 		registerCommand(new Spawn(mm));
 		registerCommand(new Leave(mm));
 		registerCommand(new Start(mm));
@@ -62,7 +63,7 @@ public class MinigameCommandsAndListener implements CommandExecutor, Listener {
 	}
 
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-		List<String> paramList = new LinkedList<String>();
+		LinkedList<String> paramList = new LinkedList<String>();
 		Utils.addArrayToList(paramList, args);
 		Iterator<String> it = paramList.iterator();
 		if ("db".equalsIgnoreCase(cmd.getName())) {

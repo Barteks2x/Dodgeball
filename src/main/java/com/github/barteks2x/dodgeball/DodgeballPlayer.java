@@ -73,14 +73,15 @@ public class DodgeballPlayer {
 			pi.setLeggings(null);
 			m.onPlayerDeath(this);
 		}
-		player.setHealth(Math.max(0, health));
-		player.setFoodLevel(10);
 		if (isSpectator) {
 			player.setAllowFlight(true);
 			player.setFlying(true);
+			this.health = 20;
 			sa.setPlayerInArea(player, newLoc);
 		} else {
 			ta.setPlayerInArea(player, newLoc);
 		}
+		player.setHealth(Math.max(0, health));
+		player.setFoodLevel(10);
 	}
 }

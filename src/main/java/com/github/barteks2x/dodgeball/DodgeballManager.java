@@ -28,7 +28,7 @@ public class DodgeballManager implements Listener, Serializable {
 		this.players = new HashMap<String, DodgeballPlayer>(plug.getServer().getMaxPlayers() + 5);
 		Collection<Dodgeball> c = minigames.values();
 		for (Dodgeball db : c) {
-			db.init();
+			db.reinit();
 		}
 		return this;
 	}
@@ -148,23 +148,21 @@ public class DodgeballManager implements Listener, Serializable {
 		}
 		final DodgeballTeam winnerTeam = m.getWinnerTeam();
 		final DodgeballPlayer[] pList = new DodgeballPlayer[m.playerList.toArray().length + 1];
-		m.isStarted = false;//to avoid StackOverflowError (infinite recrusion)
 		m.playerList.toArray(pList);
 		for (DodgeballPlayer p : pList) {
 			if (p == null) {
 				continue;
 			}
-			m.onPlayerDeath(p);//set player spectator
+			p.isSpectator = true;
 		}
-		m.isStarted = true;
 		int fireworks = 10;
 		for (int i = 0; i < fireworks; ++i) {
 			new FireworkEffectTask(rand.nextLong(), m.area).runTaskLater(plug,
 					rand.nextInt(8 * 20) + 2 * 20);
 		}
 		new BukkitRunnable() {
-			private void stopMinigame_exec(Dodgeball m) {
-				m.onStop();
+			public void run() {
+				m.isStarted = false;
 				for (DodgeballPlayer p : pList) {
 					if (p == null) {
 						continue;
@@ -175,10 +173,7 @@ public class DodgeballManager implements Listener, Serializable {
 					}
 					removePlayer(p);
 				}
-			}
-
-			public void run() {
-				stopMinigame_exec(m);
+				m.onStop();
 			}
 		}.runTaskLater(plug, 10 * 20);
 	}

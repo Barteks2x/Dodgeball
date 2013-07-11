@@ -23,10 +23,10 @@ public class Dodgeball implements Serializable {
 	protected LocationSerializable spawn;
 	protected final String name;
 	protected DodgeballManager mm;
-	public int players;
+	public transient int players;
 	public transient boolean isStarted = false;
 	public int maxPlayers;
-	public int votes;
+	public transient int votes;
 	private final CubeSerializable TEAM_1_AREA;
 	private final CubeSerializable TEAM_2_AREA;
 	private final CubeSerializable SPECTATE_AREA;
@@ -70,10 +70,12 @@ public class Dodgeball implements Serializable {
 				getZ()) / (8F + 1F / 3F));
 	}
 
-	public void init() {
+	public void reinit() {
 		playerList = new ArrayList<DodgeballPlayer>(maxPlayers + 5);
 		teamPlayerCount = new int[DodgeballTeam.values().length];
 		isStarted = false;
+		players = 0;
+		votes = 0;
 	}
 
 	public void handlePlayerMove(PlayerMoveEvent e) {
@@ -139,8 +141,8 @@ public class Dodgeball implements Serializable {
 	}
 
 	public void onStop() {
-		isStarted = false;
 		area.removeNonPlayerEntities();
+		reinit();
 	}
 
 	public void onStart() {
@@ -151,7 +153,7 @@ public class Dodgeball implements Serializable {
 		pl.setItemInHand(new ItemStack(Material.SNOW_BALL, 3));
 		for (DodgeballPlayer p : parray) {
 			setPlayerAtRandomLocation(pl);
-			p.getPlayer().sendMessage(ChatColor.MAGIC + "Minigame Started!");
+			p.getPlayer().sendMessage(ChatColor.GREEN + "Minigame Started!");
 		}
 	}
 

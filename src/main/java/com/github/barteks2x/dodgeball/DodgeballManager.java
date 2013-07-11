@@ -167,15 +167,25 @@ public class DodgeballManager implements Listener, Serializable {
 					if (p == null) {
 						continue;
 					}
-					if (winnerTeam != null) {
-						p.getPlayer().sendMessage(ChatColor.GOLD + "Winner team: " + winnerTeam.
-								getColor() + winnerTeam.toString().toLowerCase());
-					}
 					removePlayer(p);
 				}
 				m.onStop();
 			}
 		}.runTaskLater(plug, 10 * 20);
+
+		new BukkitRunnable() {
+			public void run() {
+				for (DodgeballPlayer p : pList) {
+					if (p == null) {
+						continue;
+					}
+					if (winnerTeam != null) {
+						p.getPlayer().sendMessage(ChatColor.GOLD + "Winner team: " + winnerTeam.
+								getColor() + winnerTeam.toString().toLowerCase());
+					}
+				}
+			}
+		}.runTaskLater(plug, 30);
 	}
 
 	public void startMinigameDelayed(final Dodgeball m) {
@@ -185,11 +195,15 @@ public class DodgeballManager implements Listener, Serializable {
 		new BukkitRunnable() {
 			public void run() {
 				new StartMinigameTask(m).runTaskLater(plug, 30 * 20);
-				new SendMessageTask("30 seconds to start minigame...").runTask(plug);
-				new SendMessageTask("20 seconds to start minigame...").runTaskLater(plug, 10 * 20);
-				new SendMessageTask("15 seconds to start minigame...").runTaskLater(plug, 15 * 20);
+				new SendMessageTask(ChatColor.DARK_RED + "30 seconds to start minigame...").runTask(
+						plug);
+				new SendMessageTask(ChatColor.RED + "20 seconds to start minigame...").runTaskLater(
+						plug, 10 * 20);
+				new SendMessageTask(ChatColor.YELLOW + "15 seconds to start minigame...").
+						runTaskLater(plug, 15 * 20);
 				for (int i = 10; i > 0; --i) {
-					new SendMessageTask(i + " seconds to start minigame...").runTaskLater(plug,
+					new SendMessageTask(ChatColor.GREEN + String.valueOf(i) +
+							" seconds to start minigame...").runTaskLater(plug,
 							(30 * 20) - i * 20);
 				}
 			}

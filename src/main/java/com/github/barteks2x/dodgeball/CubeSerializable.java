@@ -76,7 +76,7 @@ public class CubeSerializable implements Serializable {
 		int maxXC = (int)maxPoint.x >> 4;
 		int ZC = (int)minPoint.z >> 4;
 		int maxZC = (int)maxPoint.z >> 4;
-		int ZCS = maxZC - ZC;
+		int ZCS = ZC;
 		World w = minPoint.getWorldObj();
 		for (; XC <= maxXC; ++XC) {
 			for (; ZC <= maxZC; ++ZC) {
@@ -89,7 +89,7 @@ public class CubeSerializable implements Serializable {
 					}
 				}
 			}
-			ZC -= ZCS;
+			ZC = ZCS;
 		}
 	}
 }

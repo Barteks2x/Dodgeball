@@ -38,28 +38,27 @@ public class ArenaCreator extends BukkitRunnable {
 		for (int x = minX; x <= maxX; ++x) {
 			for (int y = minY; y <= maxY; ++y) {
 				for (int z = minZ; z <= maxZ; ++z) {
-					blockUpdates.add(new BlockData(0, 0, new LocationSerializable(w, x, y, z)));
+					blockUpdates.add(new BlockData(0, 0, new Location(w, x, y, z)));
 				}
 			}
 		}
 		for (int x = minX; x <= maxX; ++x) {
 			for (int z = minZ; z <= maxZ; ++z) {
-				blockUpdates.add(new BlockData(floor.id, floor.meta, new LocationSerializable(w, x,
-						minY, z)));
+				blockUpdates.add(new BlockData(floor.id, floor.meta, new Location(w, x, minY, z)));
 			}
 		}
 		for (int x = minX; x <= maxX; ++x) {
 			for (int y = minY; y <= maxY; ++y) {
 				if (y < sectionHeight + minY) {
-					blockUpdates.add(new BlockData(wall1.id, wall2.meta, new LocationSerializable(w,
+					blockUpdates.add(new BlockData(wall1.id, wall2.meta, new Location(w,
 							x, y, minZ)));
-					blockUpdates.add(new BlockData(wall1.id, wall2.meta, new LocationSerializable(w,
+					blockUpdates.add(new BlockData(wall1.id, wall2.meta, new Location(w,
 							x, y, maxZ)));
 				} else {
-					blockUpdates.add(new BlockData(wall2.id, wall2.meta, new LocationSerializable(w,
-							x, y, minZ)));
-					blockUpdates.add(new BlockData(wall2.id, wall2.meta, new LocationSerializable(w,
-							x, y, maxZ)));
+					blockUpdates.add(
+							new BlockData(wall2.id, wall2.meta, new Location(w, x, y, minZ)));
+					blockUpdates.add(
+							new BlockData(wall2.id, wall2.meta, new Location(w, x, y, maxZ)));
 				}
 
 			}
@@ -67,15 +66,15 @@ public class ArenaCreator extends BukkitRunnable {
 		for (int z = minZ; z <= maxZ; ++z) {
 			for (int y = minY; y <= maxY; ++y) {
 				if (y < sectionHeight + minY) {
-					blockUpdates.add(new BlockData(wall1.id, wall1.meta, new LocationSerializable(w,
-							minX, y, z)));
-					blockUpdates.add(new BlockData(wall1.id, wall1.meta, new LocationSerializable(w,
-							maxX, y, z)));
+					blockUpdates.add(
+							new BlockData(wall1.id, wall1.meta, new Location(w, minX, y, z)));
+					blockUpdates.add(
+							new BlockData(wall1.id, wall1.meta, new Location(w, maxX, y, z)));
 				} else {
-					blockUpdates.add(new BlockData(wall2.id, wall2.meta, new LocationSerializable(w,
-							minX, y, z)));
-					blockUpdates.add(new BlockData(wall2.id, wall2.meta, new LocationSerializable(w,
-							maxX, y, z)));
+					blockUpdates.add(
+							new BlockData(wall2.id, wall2.meta, new Location(w, minX, y, z)));
+					blockUpdates.add(
+							new BlockData(wall2.id, wall2.meta, new Location(w, maxX, y, z)));
 				}
 			}
 		}
@@ -83,16 +82,16 @@ public class ArenaCreator extends BukkitRunnable {
 			int lineX = (minX + maxX) / 2;
 			for (int z = minZ; z <= maxZ; ++z) {
 				blockUpdates.add(new BlockData(line.id, line.meta,
-						new LocationSerializable(w, lineX, minY, z)));
+						new Location(w, lineX, minY, z)));
 			}
 		} else {
 			int lineX1 = (minX + maxX) / 2;
 			int lineX2 = (minX + maxX) / 2 + sgn(lineX1);//I have no idea why it must be Math.signum, if it is 1 or -1 line is shifted by one on negative/positive X positions
 			for (int z = minZ; z <= maxZ; ++z) {
 				blockUpdates.add(new BlockData(line.id, line.meta,
-						new LocationSerializable(w, lineX1, minY, z)));
+						new Location(w, lineX1, minY, z)));
 				blockUpdates.add(new BlockData(line.id, line.meta,
-						new LocationSerializable(w, lineX2, minY, z)));
+						new Location(w, lineX2, minY, z)));
 			}
 		}
 		runTasks();
@@ -112,13 +111,13 @@ public class ArenaCreator extends BukkitRunnable {
 						for (int i = 0; i < 4096; ++i) {
 							if (it.hasNext()) {
 								BlockData b = it.next();
-								Location l = b.loc.getLocation();
+								Location l = b.loc;
 								w.getBlockAt(l.getBlockX(), l.getBlockY(), l.getBlockZ()).
 										setTypeIdAndData(b.id, b.meta, false);
 							}
 						}
 
-						t.notify();//Exception...
+						t.notify();
 					}
 
 				}

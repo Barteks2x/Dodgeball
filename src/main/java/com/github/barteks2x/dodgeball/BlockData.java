@@ -1,13 +1,13 @@
 package com.github.barteks2x.dodgeball;
 
-import java.io.Serializable;
+import org.bukkit.Location;
 
-public class BlockData implements Serializable {
+public class BlockData {
 
 	private static final long serialVersionUID = 4252365235623845L;
 	public final int id;
 	public final byte meta;
-	public final LocationSerializable loc;
+	public final Location loc;
 
 	public BlockData(int id) {
 		this(id, 0);
@@ -17,7 +17,7 @@ public class BlockData implements Serializable {
 		this(id, meta, null);
 	}
 
-	public BlockData(int id, int meta, LocationSerializable loc) {
+	public BlockData(int id, int meta, Location loc) {
 		this.id = id;
 		this.meta = (byte)meta;
 		this.loc = loc;

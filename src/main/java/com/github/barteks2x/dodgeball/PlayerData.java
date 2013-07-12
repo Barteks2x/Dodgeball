@@ -47,7 +47,9 @@ class PlayerData {
 		p.setHealth(p.getMaxHealth());
 		p.removePotionEffect(PotionEffectType.INVISIBILITY);
 		p.addPotionEffects(potions);
-		if (m.getSpawn() != null) {
+		if (m.mm.getGlobalSpawn() != null && m.mm.getGlobalSpawn().getWorldObj() != null) {
+			p.teleport(m.mm.getGlobalSpawn().getLocation());
+		} else if (m.getSpawn() != null) {
 			p.teleport(m.getSpawn());
 		} else if (p.getBedSpawnLocation() != null) {
 			p.teleport(p.getBedSpawnLocation());

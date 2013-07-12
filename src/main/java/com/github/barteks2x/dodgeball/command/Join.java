@@ -38,7 +38,7 @@ public class Join {
 					"Minigame not exist! Are you sure name is correct?\"Mini\" and \"MiNi\" are different minigames!");
 			return true;
 		}
-		if (m.isStarted) {
+		if (!m.canJoin()) {
 			sender.sendMessage(YELLOW + "Minigame already started!");
 			return true;
 		}
@@ -50,6 +50,10 @@ public class Join {
 		}
 		String team = sender.hasPermission("db.join.selectteam") ? args.hasNext() ? args.next().
 				toUpperCase() : null : null;
+		if (m.maxPlayers >= m.players && !sender.hasPermission("db.joinfull")) {
+			sender.sendMessage(DARK_RED + "Arena full! You can't join!");
+			return true;
+		}
 		mm.addPlayer(mm.createPlayer((Player)sender, m, team));
 		sender.sendMessage(AQUA + "Joined to minigame: " + n);
 		return true;

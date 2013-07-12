@@ -30,7 +30,7 @@ public class Stop {
 			sender.sendMessage("Minigame not exist!");
 			return true;
 		}
-		mm.stopMinigame(args.next());
+		mm.stopMinigame(name);
 		sender.sendMessage(ChatColor.GOLD + "10 seconds to stop Minigame!");
 		return true;
 	}

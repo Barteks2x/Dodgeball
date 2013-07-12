@@ -24,15 +24,17 @@ public class Dodgeball implements Serializable {
 	protected final String name;
 	protected DodgeballManager mm;
 	public transient int players;
-	public transient boolean isStarted = false;
+	private transient boolean isStarted = false;
 	public int maxPlayers;
 	public transient int votes;
 	private final CubeSerializable TEAM_1_AREA;
 	private final CubeSerializable TEAM_2_AREA;
 	private final CubeSerializable SPECTATE_AREA;
-	private final DodgeballTeam TEAM_1, TEAM_2;
+	public final DodgeballTeam TEAM_1, TEAM_2;
 	private final Random rand = new Random();
 	private final double TEAM_1_SPAWN_X, TEAM_2_SPAWN_X;
+	private transient boolean preStart = false;
+	private boolean preStop = false;
 
 	public Dodgeball(Plugin plug, Location minPoint, Location maxPoint, String name,
 			DodgeballTeam team1, DodgeballTeam team2) {
@@ -76,6 +78,8 @@ public class Dodgeball implements Serializable {
 		isStarted = false;
 		players = 0;
 		votes = 0;
+		preStart = false;
+		preStop = false;
 	}
 
 	public void handlePlayerMove(PlayerMoveEvent e) {
@@ -141,11 +145,14 @@ public class Dodgeball implements Serializable {
 	}
 
 	public void onStop() {
+		preStop = false;
 		area.removeNonPlayerEntities();
 		reinit();
 	}
 
 	public void onStart() {
+		preStop = false;
+		preStart = false;
 		isStarted = true;
 		DodgeballPlayer parray[] = new DodgeballPlayer[1];
 		parray = playerList.toArray(parray);
@@ -179,6 +186,30 @@ public class Dodgeball implements Serializable {
 		teamPlayerCount[p.getTeam().ordinal()]--;
 		p.isSpectator = true;
 		stopIfDone();
+	}
+
+	public void preStart() {
+		preStart = true;
+	}
+
+	public boolean isPerStart() {
+		return preStart;
+	}
+
+	public void preStop() {
+		preStop = true;
+	}
+
+	public boolean canStart() {
+		return !(isStarted || preStart);
+	}
+
+	public boolean canJoin() {
+		return !isStarted;
+	}
+
+	public boolean canStop() {
+		return !(preStop || !isStarted);
 	}
 
 	private CubeSerializable getPlayerTeamArea(DodgeballPlayer p) {
@@ -246,8 +277,12 @@ public class Dodgeball implements Serializable {
 	}
 
 	private void stopIfDone() {
-		if (isDone()) {
+		if (isDone() && !(preStop || preStart)) {
 			mm.stopMinigame(this);
 		}
+	}
+
+	public int getTeamPlayers(DodgeballTeam t) {
+		return teamPlayerCount[t.ordinal()];
 	}
 }

@@ -39,13 +39,20 @@ public class ListDB {
 		while (it.hasNext()) {
 			d = it.next();
 			if (i >= starti) {
-				ChatColor c = d.isStarted ? ChatColor.DARK_RED : ChatColor.GREEN;
-				sender.sendMessage(c + "Name: " + d.getName() + "     Players: " + d.players +
-						"     Started: " + (d.isStarted ? "yes" : "no"));
+				ChatColor c = d.canJoin() ? d.isPerStart() ? ChatColor.AQUA : ChatColor.GREEN :
+						ChatColor.RED;
+				StringBuilder message = new StringBuilder(c + "Name: ");
+				message.append(d.getName());
+				message.append("  Players: ").append(d.players);
+				message.append("  Can join: ").append(d.canJoin() ? "yes" : "no");
+				message.append(" ").append(d.TEAM_1.toString().toLowerCase()).append(": ").append(d.
+						getTeamPlayers(d.TEAM_1));
+				message.append(" ").append(d.TEAM_2.toString().toLowerCase()).append(": ").append(d.
+						getTeamPlayers(d.TEAM_2));
+				sender.sendMessage(message.toString());
 			}
 			if (i >= stopi) {
-				sender.sendMessage(ChatColor.BLUE + "Use /db list " + (page + 1) +
-						" to see more.");
+				sender.sendMessage(ChatColor.BLUE + "Use /db list " + (page + 1) + " to see more.");
 				return true;
 			}
 			++i;

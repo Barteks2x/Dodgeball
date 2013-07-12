@@ -9,27 +9,28 @@ commands:
   db:
     description: Make arena
     usage: |
-        Use /db help <subcommand> [<subcommand2>] or /mghelp for more information
-        <something> - required parameter
-        [<something>] - optional parameter
-        /db reload-config - reload minigame config
-        /db automake <TEAM1-COLOR:TEAM2-COLOR> <name> <floor-id>[:<meta>] <wall-id1>[:<meta>] <wall-id2>[:<meta>] <line-id>[:<meta>] height - build arena in worldedit selection. Example: /db arena autobuild minigame1 /db 5:3 35:11 20 89 3
-        /db save <minigame-name> [<on-start-auto-rebuild(true/false)>] - save current arena state (minigame MUST be created)
-        /db delete <name>
-        /db start <name>
-        /db stop <name>
-        /db kickplayer <minigame-name> <player>
-        /db join <name> - join minigame
-        /db leave - leave minigame
+        /db am /db automake - create arena. Usage:/db am team1Color:team2Color name floor_block_id wall_block_id_1 wall_id_2 line_id height 
+        height - wall blocks below the specified height are floor_id_1, other are wall_id_2
+        permission: db.automake
+        /db start name- start dodgeball (after 30 seconds), permission: db.start
+        /db stop name- stop dodgeball (after 10 seconds), permission: db.stop
+        /db join name - join, permission: db.join
+        /db leave - leave, permission: db.leave
+        /db help - help, permission: db.help
+        /db kickplayer - kick player from dodgeball, permission: db.kickplayer
+        /db list page- list minigames, permissions: db.list
+        /db spawn /db setspawn - set lobby spawn, permission: db.setspawn
+        /db spectate - join dodgeball as spectator, permission: db.spectate
+        /db vote - vote on starting current dodgeball before maximum amount of players joins. permission: db.vote
 permissions:
   db.admin:
-    decription: Gives access to all commands recommended for admins (except reload)
+    decription: Gives access to all commands recommended for admins
     children:
       db.delete: true
       db.start: true
       db.stop: true
       db.player: true
-  db:
+  db.all:
     description: Gives access to all dodgeball commands
     children:
       db.reload: true
@@ -54,10 +55,11 @@ permissions:
     children:
       db.join: true
       db.leave: true
-      db.help.player: true
   db.join:
     description: Gives access to /db join (/join)
   db.leave:
     description: Gives access to /db leave (/leave)
   db.list:
     description: Gives access to /db list command
+  db.joiniffull:
+    description: Allows to join Dodgeball when it's full

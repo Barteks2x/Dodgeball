@@ -18,6 +18,7 @@ public class DodgeballManager implements Listener, Serializable {
 	private transient HashMap<String, DodgeballPlayer> players;
 	private transient HashMap<String, PlayerData> playersData;
 	private final Random rand = new Random();
+	private LocationSerializable globalSpawn;
 
 	public DodgeballManager() {
 		this.minigames = new HashMap<String, Dodgeball>(5);
@@ -47,7 +48,7 @@ public class DodgeballManager implements Listener, Serializable {
 		pl.getEquipment().clear();
 		m.onPlayrJoin(p);
 		m.setPlayerAtRandomLocation(pl);
-		if (m.playerList.toArray().length >= m.maxPlayers) {
+		if (m.playerList.toArray().length >= m.maxPlayers - 10) {
 			startMinigameDelayed(m);
 		} else {
 			pl.sendMessage(ChatColor.GOLD +
@@ -73,7 +74,6 @@ public class DodgeballManager implements Listener, Serializable {
 		if (m.getSpawn() != null) {
 			pl.teleport(m.getSpawn());
 		}
-		m.onPlayerLeave(p);
 		playersData.get(pl.getName()).restorePlayerData();
 		players.remove(pl.getName());
 		m.onPlayerLeave(p);
@@ -137,15 +137,17 @@ public class DodgeballManager implements Listener, Serializable {
 
 	public void vote(final Dodgeball m) {
 		m.votes++;
-		if (m.votes >= .5F * m.playerList.toArray().length) {
+		if (m.votes >= Math.sqrt(m.maxPlayers) * Math.log10(m.maxPlayers) || m.votes >=
+				m.maxPlayers / 4) {
 			startMinigameDelayed(m);
 		}
 	}
 
 	void stopMinigame(final Dodgeball m) {
-		if (!m.isStarted) {
+		if (!m.canStop()) {
 			return;
 		}
+		m.preStop();
 		final DodgeballTeam winnerTeam = m.getWinnerTeam();
 		final DodgeballPlayer[] pList = new DodgeballPlayer[m.playerList.toArray().length + 1];
 		m.playerList.toArray(pList);
@@ -162,7 +164,6 @@ public class DodgeballManager implements Listener, Serializable {
 		}
 		new BukkitRunnable() {
 			public void run() {
-				m.isStarted = false;
 				for (DodgeballPlayer p : pList) {
 					if (p == null) {
 						continue;
@@ -189,9 +190,10 @@ public class DodgeballManager implements Listener, Serializable {
 	}
 
 	public void startMinigameDelayed(final Dodgeball m) {
-		if (m.isStarted) {
+		if (!m.canStart()) {
 			return;
 		}
+		m.preStart();
 		new BukkitRunnable() {
 			public void run() {
 				new StartMinigameTask(m).runTaskLater(plug, 30 * 20);
@@ -274,5 +276,13 @@ public class DodgeballManager implements Listener, Serializable {
 				Logger.getLogger(DodgeballManager.class.getName()).log(Level.SEVERE, null, ex);
 			}
 		}
+	}
+
+	public void setGlobalSpawn(Location l) {
+		globalSpawn = new LocationSerializable(l);
+	}
+
+	public LocationSerializable getGlobalSpawn() {
+		return globalSpawn;
 	}
 }

@@ -118,8 +118,8 @@ public class Dodgeball implements Serializable {
 			e.setCancelled(true);
 			return;
 		}
-		Location itemPos = player.getLocation();
-		w.dropItemNaturally(itemPos.add(0, 1, 0), new ItemStack(Material.SNOW_BALL, 1));
+		//Location itemPos = player.getLocation();
+		//w.dropItemNaturally(itemPos.add(0, 1, 0), new ItemStack(Material.SNOW_BALL, 1));//item is dropped onProjectileHitEvent
 		s.remove();
 		setPlayerAtRandomLocation(player);
 
@@ -131,7 +131,8 @@ public class Dodgeball implements Serializable {
 		if (e.getEntity() instanceof Snowball) {
 			Snowball s = (Snowball)e.getEntity();
 			if (area.isInArea(s.getLocation())) {
-				s.getWorld().dropItem(s.getLocation(), new ItemStack(Material.SNOW_BALL, 1));
+				s.getWorld().
+						dropItemNaturally(s.getLocation(), new ItemStack(Material.SNOW_BALL, 1));
 				s.remove();
 			}
 		}

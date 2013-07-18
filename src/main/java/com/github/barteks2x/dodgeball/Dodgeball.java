@@ -46,30 +46,30 @@ public class Dodgeball implements Serializable {
 		this.mm = plug.getMinigameManager();
 		mm.addMinigame(this);
 		World w = minPoint.getWorld();
-		double minX1 = minPoint.getX();
-		double minY1 = minPoint.getY();
-		double minZ1 = minPoint.getZ();
-		double maxX1 = (minPoint.getX() + maxPoint.getX()) / 2;
-		double maxY1 = maxPoint.getY();
-		double maxZ1 = maxPoint.getZ();
+		double minX1 = minPoint.getX() + .5D;//Block center = block position + 0.5
+		double minY1 = minPoint.getY() + .5D;
+		double minZ1 = minPoint.getZ() + .5D;
+		double maxX1 = (minX1 + maxPoint.getX() + .5D) / 2;
+		double maxY1 = maxPoint.getY() + .5D;
+		double maxZ1 = maxPoint.getZ() + .5D;
 		TEAM_1_AREA = new CubeSerializable(new LocationSerializable(w, minX1, minY1, minZ1),
 				new LocationSerializable(w, maxX1, maxY1, maxZ1));
 		double minX2 = maxX1;
 		double minY2 = minY1;
 		double minZ2 = minZ1;
-		double maxX2 = maxPoint.getX();
+		double maxX2 = maxPoint.getX() + .5D;
 		double maxY2 = maxY1;
 		double maxZ2 = maxZ1;
 		TEAM_2_AREA = new CubeSerializable(new LocationSerializable(w, minX2, minY2, minZ2),
 				new LocationSerializable(w, maxX2, maxY2, maxZ2));
 		this.TEAM_1 = team1;
 		this.TEAM_2 = team2;
-		TEAM_1_SPAWN_X = minX1 + 1 + 0.5D;//Block center = block position + 0.5
+		TEAM_1_SPAWN_X = minX1 + 1 + 0.5D;
 		TEAM_2_SPAWN_X = maxX2 - 1 + 0.5D;
 		SPECTATE_AREA = new CubeSerializable(new LocationSerializable(minPoint).add(new Vector(0, 5,
 				0)).getLocation(), maxPoint);
-		this.maxPlayers = (int)((maxPoint.getX() - minPoint.getX()) * (maxPoint.getZ() - minPoint.
-				getZ()) / (8F + 1F / 3F));
+		this.maxPlayers = (int)Math.abs(((maxPoint.getX() - minPoint.getX()) * (maxPoint.getZ() -
+				minPoint.getZ()) / (8F + 1F / 3F)));
 	}
 
 	public void reinit() {

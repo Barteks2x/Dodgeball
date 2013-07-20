@@ -1,6 +1,7 @@
 package com.github.barteks2x.dodgeball;
 
 import java.util.Collection;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -18,6 +19,9 @@ class PlayerData {
 	private final Location loc;
 	private final Dodgeball m;
 	private final Collection<PotionEffect> potions;
+	private final GameMode gm;
+	private final boolean fly;
+	private final boolean flyAllowed;
 
 	public PlayerData(DodgeballPlayer mp) {
 		this.p = mp.getPlayer();
@@ -32,6 +36,9 @@ class PlayerData {
 		this.loc = p.getLocation();
 		this.m = mp.getMinigame();
 		this.potions = p.getActivePotionEffects();
+		this.gm = p.getGameMode();
+		this.fly = p.isFlying();
+		this.flyAllowed = p.getAllowFlight();
 	}
 
 	public void restorePlayerData() {
@@ -47,6 +54,9 @@ class PlayerData {
 		p.setHealth(p.getMaxHealth());
 		p.removePotionEffect(PotionEffectType.INVISIBILITY);
 		p.addPotionEffects(potions);
+		p.setGameMode(gm);
+		p.setAllowFlight(flyAllowed);
+		p.setFlying(fly);
 		if (m.mm.getGlobalSpawn() != null && m.mm.getGlobalSpawn().getWorldObj() != null) {
 			p.teleport(m.mm.getGlobalSpawn().getLocation());
 		} else if (m.getSpawn() != null) {

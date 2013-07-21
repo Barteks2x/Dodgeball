@@ -10,6 +10,7 @@ import org.bukkit.potion.PotionEffectType;
 
 public class DodgeballPlayer {
 
+	private final double playerHealthUnit;
 	private final DodgeballTeam team;
 	private final String pName;
 	private transient Player player;
@@ -23,10 +24,11 @@ public class DodgeballPlayer {
 		this.player = player;
 		this.team = team;
 		this.m = mg;
-		player.setHealth(6);
-		player.setFoodLevel(4);
+		this.playerHealthUnit = player.getHealth() / 10D;
+		player.setHealth(3 * playerHealthUnit);
+		player.setFoodLevel(10);
 		player.getInventory().setHelmet(new ItemStack(Material.WOOL, 1, (short)team.ordinal()));
-		health = 6;
+		health = 3;
 		spawnX = mg.getSpawnX(this);
 	}
 
@@ -61,10 +63,11 @@ public class DodgeballPlayer {
 	public void update(DodgeballManager mm, CubeSerializable ta, CubeSerializable sa,
 			Location newLoc) {
 		if (health <= 0) {
-			this.health = 20;
+			this.health = 10;
 			player.setAllowFlight(true);
 			player.setFlying(true);
-			player.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 1000000, 1));
+			player.addPotionEffect(
+					new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1));
 			player.getInventory().clear();
 			PlayerInventory pi = player.getInventory();
 			pi.setBoots(null);
@@ -76,12 +79,12 @@ public class DodgeballPlayer {
 		if (isSpectator) {
 			player.setAllowFlight(true);
 			player.setFlying(true);
-			this.health = 20;
+			this.health = 10;
 			sa.setPlayerInArea(player, newLoc);
 		} else {
 			ta.setPlayerInArea(player, newLoc);
 		}
-		player.setHealth(Math.max(0, health));
+		player.setHealth(Math.max(0, health) * playerHealthUnit);
 		player.setFoodLevel(10);
 	}
 }

@@ -123,7 +123,7 @@ public class Dodgeball implements Serializable {
 		s.remove();
 		setPlayerAtRandomLocation(player);
 
-		mp.health -= 2;
+		--mp.health;
 		mp.update(mm, getPlayerTeamArea(mp), SPECTATE_AREA, player.getLocation());
 	}
 

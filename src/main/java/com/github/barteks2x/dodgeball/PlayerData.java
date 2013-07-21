@@ -15,7 +15,6 @@ class PlayerData {
 	private final float exp;
 	private final ItemStack boots, leggins, chestplate, helmet;
 	private final float exhausion;
-	private final int maxHealth;
 	private final Location loc;
 	private final Dodgeball m;
 	private final Collection<PotionEffect> potions;
@@ -32,7 +31,6 @@ class PlayerData {
 		this.leggins = p.getInventory().getLeggings();
 		this.boots = p.getInventory().getBoots();
 		this.exhausion = p.getExhaustion();
-		this.maxHealth = p.getMaxHealth();
 		this.loc = p.getLocation();
 		this.m = mp.getMinigame();
 		this.potions = p.getActivePotionEffects();
@@ -50,7 +48,6 @@ class PlayerData {
 		p.getInventory().setHelmet(helmet);
 		p.setExhaustion(exhausion);
 		p.setFoodLevel(20);
-		p.setMaxHealth(maxHealth);
 		p.setHealth(p.getMaxHealth());
 		p.removePotionEffect(PotionEffectType.INVISIBILITY);
 		p.addPotionEffects(potions);

@@ -50,7 +50,7 @@ public class Join {
 		}
 		String team = sender.hasPermission("db.join.selectteam") ? args.hasNext() ? args.next().
 				toUpperCase() : null : null;
-		if (m.maxPlayers >= m.players && !sender.hasPermission("db.joinfull")) {
+		if (m.maxPlayers <= m.players && !sender.hasPermission("db.joinfull")) {
 			sender.sendMessage(DARK_RED + "Arena full! You can't join!");
 			return true;
 		}

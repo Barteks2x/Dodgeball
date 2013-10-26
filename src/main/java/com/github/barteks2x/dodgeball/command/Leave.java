@@ -30,7 +30,7 @@ public class Leave {
 			return true;
 		}
 		mm.removePlayer(mm.getMinigamePlayer(((Player)sender).getName()));
-		sender.sendMessage(GREEN + "Left ciurrent minigame.");
+		sender.sendMessage(GREEN + "Left current minigame.");
 		return true;
 	}
 }

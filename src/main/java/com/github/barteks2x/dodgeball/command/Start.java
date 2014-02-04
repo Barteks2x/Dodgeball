@@ -9,31 +9,31 @@ import static org.bukkit.ChatColor.RED;
 
 public class Start {
 
-	private final DodgeballManager mm;
+    private final DodgeballManager mm;
 
-	public Start(DodgeballManager mm) {
-		this.mm = mm;
-	}
+    public Start(DodgeballManager mm) {
+        this.mm = mm;
+    }
 
-	@DBCommand
-	public boolean start(CommandSender sender, Iterator<String> args) {
-		if (!sender.hasPermission("db.start")) {
-			sender.sendMessage(RED + "You don't have permission to use this command!");
-			return true;
-		}
+    @DBCommand
+    public boolean start(CommandSender sender, Iterator<String> args) {
+        if(!sender.hasPermission("db.start")) {
+            sender.sendMessage(RED + "You don't have permission to use this command!");
+            return true;
+        }
 
-		if (!args.hasNext()) {
-			sender.sendMessage(
-					"Not enough parameters!\n/minigame help <command1> <command2> ... for more info");
-			return false;
-		}
-		String name = args.next();
-		final Dodgeball m = mm.getMinigame(name);
-		if (m == null) {
-			sender.sendMessage(RED + "Minigame doesn't exist!");
-			return true;
-		}
-		mm.startMinigameDelayed(m);
-		return true;
-	}
+        if(!args.hasNext()) {
+            sender.sendMessage(
+                    "Not enough parameters!\n/minigame help <command1> <command2> ... for more info");
+            return false;
+        }
+        String name = args.next();
+        final Dodgeball m = mm.getMinigame(name);
+        if(m == null) {
+            sender.sendMessage(RED + "Minigame doesn't exist!");
+            return true;
+        }
+        mm.startMinigameDelayed(m);
+        return true;
+    }
 }

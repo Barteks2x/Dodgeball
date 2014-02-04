@@ -10,27 +10,27 @@ import static org.bukkit.ChatColor.GREEN;
 
 public class Leave {
 
-	private final DodgeballManager mm;
+    private final DodgeballManager mm;
 
-	public Leave(DodgeballManager mm) {
-		this.mm = mm;
-	}
+    public Leave(DodgeballManager mm) {
+        this.mm = mm;
+    }
 
-	@DBCommand
-	public boolean leave(CommandSender sender, Iterator<String> args) {
-		if (!sender.hasPermission("db.leave")) {
-			sender.sendMessage(ChatColor.RED + "You don't have permission to use this command!");
-			return true;
-		}
-		if (!(sender instanceof Player)) {
-			sender.sendMessage("This command must be used by player");
-			return true;
-		}
-		if (!mm.hasPlayer(((Player)sender).getName())) {
-			return true;
-		}
-		mm.removePlayer(mm.getMinigamePlayer(((Player)sender).getName()));
-		sender.sendMessage(GREEN + "Left current minigame.");
-		return true;
-	}
+    @DBCommand
+    public boolean leave(CommandSender sender, Iterator<String> args) {
+        if(!sender.hasPermission("db.leave")) {
+            sender.sendMessage(ChatColor.RED + "You don't have permission to use this command!");
+            return true;
+        }
+        if(!(sender instanceof Player)) {
+            sender.sendMessage("This command must be used by player");
+            return true;
+        }
+        if(!mm.hasPlayer(sender.getName())) {
+            return true;
+        }
+        mm.removePlayer(mm.getMinigamePlayer(sender.getName()));
+        sender.sendMessage(GREEN + "Left current minigame.");
+        return true;
+    }
 }

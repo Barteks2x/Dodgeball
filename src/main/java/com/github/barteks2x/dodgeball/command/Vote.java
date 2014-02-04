@@ -10,25 +10,25 @@ import static org.bukkit.ChatColor.RED;
 
 public class Vote {
 
-	private final DodgeballManager mm;
+    private final DodgeballManager mm;
 
-	public Vote(DodgeballManager mm) {
-		this.mm = mm;
-	}
+    public Vote(DodgeballManager mm) {
+        this.mm = mm;
+    }
 
-	@DBCommand
-	public boolean vote(CommandSender sender, Iterator<String> args) {
-		if (!(sender instanceof Player)) {
-			sender.sendMessage("This command can be used only by player");
-			return true;
-		}
-		if (!sender.hasPermission("db.vote")) {
-			sender.sendMessage(RED + "You don't have permission to use this command!");
-			return true;
-		}
+    @DBCommand
+    public boolean vote(CommandSender sender, Iterator<String> args) {
+        if(!(sender instanceof Player)) {
+            sender.sendMessage("This command can be used only by player");
+            return true;
+        }
+        if(!sender.hasPermission("db.vote")) {
+            sender.sendMessage(RED + "You don't have permission to use this command!");
+            return true;
+        }
 
-		Dodgeball m = mm.getPlayerMinigame(sender.getName());
-		mm.vote(m);
-		return true;
-	}
+        Dodgeball m = mm.getPlayerMinigame(sender.getName());
+        mm.vote(m);
+        return true;
+    }
 }

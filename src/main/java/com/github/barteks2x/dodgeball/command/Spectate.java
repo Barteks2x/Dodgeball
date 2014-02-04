@@ -9,43 +9,43 @@ import static org.bukkit.ChatColor.*;
 
 public class Spectate {
 
-	private final DodgeballManager mm;
+    private final DodgeballManager mm;
 
-	public Spectate(DodgeballManager mm) {
-		this.mm = mm;
-	}
+    public Spectate(DodgeballManager mm) {
+        this.mm = mm;
+    }
 
-	@DBCommand
-	public boolean spawn(CommandSender sender, Iterator<String> args) {
-		if (!sender.hasPermission("db.spectate")) {
-			sender.sendMessage(RED + "You don't have permission to use this command!");
-			return true;
-		}
-		if (!(sender instanceof Player)) {
-			sender.sendMessage("This command must be executed by player");
-			return true;
-		}
-		if (!args.hasNext()) {
-			sender.sendMessage(YELLOW + "No minigame specified!");
-			return true;
-		}
-		String n = args.next();
-		String p = ((Player)sender).getName();
-		if (mm.hasPlayer(p)) {
-			sender.sendMessage(YELLOW +
-					"You can't spectate two minigames! Use /leave to leave current minigame");
-			return true;
-		}
-		Dodgeball m = mm.getMinigame(n);
-		if (m == null) {
-			sender.sendMessage(RED +
-					"Minigame not exist! Are you sure name is correct? \"Mini\" and \"MiNi\" are different minigames!");
-			return true;
-		}
-		DodgeballPlayer mp = mm.createPlayer((Player)sender, m);
-		mm.addPlayer(mp);
-		m.onPlayerDeath(mp);//Spectate
-		sender.sendMessage(GREEN + "Joined to minigame: " + n);
-		return true;
-	}
+    @DBCommand
+    public boolean spawn(CommandSender sender, Iterator<String> args) {
+        if(!sender.hasPermission("db.spectate")) {
+            sender.sendMessage(RED + "You don't have permission to use this command!");
+            return true;
+        }
+        if(!(sender instanceof Player)) {
+            sender.sendMessage("This command must be executed by player");
+            return true;
+        }
+        if(!args.hasNext()) {
+            sender.sendMessage(YELLOW + "No minigame specified!");
+            return true;
+        }
+        String n = args.next();
+        String p = sender.getName();
+        if(mm.hasPlayer(p)) {
+            sender.sendMessage(YELLOW
+                    + "You can't spectate two minigames! Use /leave to leave current minigame");
+            return true;
+        }
+        Dodgeball m = mm.getMinigame(n);
+        if(m == null) {
+            sender.sendMessage(RED
+                    + "Minigame not exist! Are you sure name is correct? \"Mini\" and \"MiNi\" are different minigames!");
+            return true;
+        }
+        DodgeballPlayer mp = mm.createPlayer((Player)sender, m);
+        mm.addPlayer(mp);
+        m.onPlayerDeath(mp);//Spectate
+        sender.sendMessage(GREEN + "Joined to minigame: " + n);
+        return true;
+    }
 }

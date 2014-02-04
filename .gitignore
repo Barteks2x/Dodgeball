@@ -1,5 +1,5 @@
 *.class
-.directory
+
 # Package Files #
 *.jar
 *.war
@@ -15,6 +15,7 @@
 /bin
 /dist
 /manifest.mf
-nbactions.xml
-nb-configuration.xml
-nbactions-release-profile.xml
+/nbactions.xml
+
+#Linux files
+/.directory
